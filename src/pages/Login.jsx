@@ -1,0 +1,270 @@
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+
+function Login() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setError("");
+    setIsLoading(true);
+
+    const formData = new FormData(e.currentTarget);
+    const identity = formData.get("identity").trim();
+    const password = formData.get("password");
+
+    try {
+      let role = "";
+      let email = "";
+
+      // Logic like satu.usu.ac.id
+      if (identity.includes("@")) {
+        // Login via Email
+        if (identity.endsWith("@students.usu.ac.id")) {
+          role = "student";
+          email = identity;
+        } else if (identity.endsWith("@usu.ac.id")) {
+          role = "staff";
+          email = identity;
+        } else {
+          setError("Gunakan email institusi USU.");
+          setIsLoading(false);
+          return;
+        }
+      } else if (/^\d+$/.test(identity)) {
+        // Login via NIM or NIP (Numeric)
+        if (identity.length === 9) {
+          role = "student";
+          email = `${identity}@students.usu.ac.id`;
+        } else if (identity.length >= 8) {
+          role = "staff";
+          email = `${identity}@usu.ac.id`;
+        } else {
+          setError("Invalid NIM or NIP format.");
+          setIsLoading(false);
+          return;
+        }
+      } else {
+        setError("Invalid identity. Please enter NIM, NIP, or USU Email.");
+        setIsLoading(false);
+        return;
+      }
+
+      // Simpan session login + role
+      localStorage.setItem("currentUserEmail", email);
+      localStorage.setItem("currentUserRole", role);
+      localStorage.setItem("currentUserIdentity", identity);
+
+      // Profil spesifik user
+      const profileKey = `temuProfile_${email}`;
+      const existingProfile = localStorage.getItem(profileKey);
+
+      if (!existingProfile) {
+        const defaultName = identity.split("@")[0];
+        const newProfile = {
+          fullName: defaultName,
+          avatarUrl: null,
+          id: identity,
+          email: email,
+          phone: "",
+          location: "Fasilkom-TI",
+          role,
+        };
+        localStorage.setItem(profileKey, JSON.stringify(newProfile));
+      }
+
+      navigate("/dashboard");
+    } catch (err) {
+      setError("Something went wrong.");
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  // Fungsi mock untuk SSO
+  const handleSSOLogin = () => {
+    setIsLoading(true);
+    // Simulasi redirect ke portal USU
+    setTimeout(() => {
+      // Login sebagai default mahasiswa untuk demo
+      const mockIdentity = "211401001";
+      const mockEmail = "211401001@students.usu.ac.id";
+      localStorage.setItem("currentUserEmail", mockEmail);
+      localStorage.setItem("currentUserRole", "student");
+      localStorage.setItem("currentUserIdentity", mockIdentity);
+      navigate("/dashboard");
+    }, 1500);
+  };
+
+  return (
+    <div className="relative min-h-screen flex items-center justify-center bg-linear-to-t from-[#0A100D]/98 to-[#164A41] overflow-hidden px-4 py-12">
+      <div className="absolute top-[-10%] left-[-10%] w-125 h-125 bg-teal-900/40 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-125 h-125 bg-emerald-950/60 rounded-full blur-3xl pointer-events-none" />
+
+      <div className="relative z-10 w-full max-w-120 flex flex-col items-center gap-10">
+        <div className="text-center space-y-2">
+          <h1 className="text-white text-[20px] font-bold tracking-wide">
+            TemuBarang
+          </h1>
+          <p className="text-gray-400 text-base font-medium">
+            Secure access to campus lost & found
+          </p>
+        </div>
+
+        <div className="w-full bg-white/3 backdrop-blur-xl border border-white/10 rounded-4xl p-8 md:p-10 shadow-[0px_8px_32px_0px_rgba(0,0,0,0.40)]">
+          <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
+            <div className="flex flex-col gap-2">
+              <label className="text-stone-400 text-xs font-semibold uppercase tracking-wider">
+                identity (NIP/NIM/USU Email)
+              </label>
+              <div className="relative">
+                <svg
+                  className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                  />
+                </svg>
+                <input
+                  name="identity"
+                  type="text"
+                  placeholder="XXXXXXXXX / name@usu.ac.id"
+                  className="w-full bg-black/20 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-white/30 focus:outline-none focus:border-[#4D774E] focus:bg-black/40 transition-all"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label className="text-stone-400 text-xs font-semibold uppercase tracking-wider">
+                Password
+              </label>
+              <div className="relative">
+                <svg
+                  className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                  />
+                </svg>
+                <input
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  className="w-full bg-black/20 border border-white/10 rounded-2xl py-4 pl-12 pr-12 text-white tracking-widest placeholder:text-white/30 placeholder:tracking-widest focus:outline-none focus:border-[#4D774E] focus:bg-black/40 transition-all"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors"
+                >
+                  {showPassword ? (
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                    </svg>
+                  ) : (
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {error && <div className="text-sm text-red-300">{error}</div>}
+
+            <div className="text-right">
+              <Link
+                to="/forgot-password"
+                className="text-[#F1B24A] text-sm font-semibold hover:text-[#e0a239] transition-colors"
+              >
+                Forgot Password?
+              </Link>
+            </div>
+
+            <button
+              type="submit"
+              className="w-full bg-[#F1B24A] hover:bg-[#e0a239] text-black font-semibold text-[16px] py-4 rounded-2xl transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+              disabled={isLoading}
+            >
+              {isLoading ? "Signing in..." : "Sign In"}
+            </button>
+          </form>
+
+          <div className="flex items-center gap-4 my-5">
+            <div className="flex-1 h-px bg-white/10"></div>
+            <span className="text-white/40 text-xs font-semibold tracking-widest">
+              OR
+            </span>
+            <div className="flex-1 h-px bg-white/10"></div>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleSSOLogin}
+            disabled={isLoading}
+            className="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-white font-medium text-[15px] py-4 rounded-2xl flex items-center justify-center gap-3 transition-colors disabled:opacity-50"
+          >
+            <svg
+              className="w-5 h-5 text-stone-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path d="M12 14l9-5-9-5-9 5 9 5z" />
+              <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"
+              />
+            </svg>
+            {isLoading ? "Connecting to SSO..." : "Login with SSO"}
+          </button>
+        </div>
+
+        <div className="text-center text-[15px] -mt-2.5">
+          <span className="text-gray-400">Don't have an account? </span>
+          <Link
+            to="/request-access"
+            className="text-stone-300 font-bold hover:text-white transition-colors"
+          >
+            Request Access
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default Login;
