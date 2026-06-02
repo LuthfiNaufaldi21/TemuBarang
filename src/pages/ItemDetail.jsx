@@ -88,7 +88,7 @@ function getReportDateText(report) {
   });
 }
 
-function ProfileMiniCard({ title, profile }) {
+function ProfileMiniCard({ title, profile, showMessage = false, onMessage }) {
   return (
     <div>
       <h4 className="text-[#86948A] text-xs font-semibold uppercase tracking-wide mb-3">
@@ -125,6 +125,29 @@ function ProfileMiniCard({ title, profile }) {
                 clipRule="evenodd"
               />
             </svg>
+
+            {showMessage && (
+              <button
+                type="button"
+                onClick={onMessage}
+                title="Send message"
+                className="ml-1 w-7 h-7 rounded-full bg-[#164A41] border border-[#3C4A42] text-[#9CC88D] flex items-center justify-center hover:bg-[#1f5f53] hover:border-[#9CC88D] transition-colors"
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+                  />
+                </svg>
+              </button>
+            )}
           </div>
 
           <span className="text-[#86948A] text-xs font-semibold">
@@ -632,6 +655,8 @@ function ItemDetail() {
   const ownerProfile = getOwnerProfile();
   const finderProfile = getFinderProfile();
 
+  const shouldShowFoundBy = isLost && isResolved && hasFinder;
+
   const getStatusBadge = () => {
     if (isResolved) {
       return {
@@ -933,9 +958,11 @@ function ItemDetail() {
                         <ProfileMiniCard
                           title="Reported by"
                           profile={reporterProfile}
+                          showMessage={!isCurrentUserReporter() && !isResolved}
+                          onMessage={handleContinueChat}
                         />
 
-                        {isMatchOrVerifying && (
+                        {shouldShowFoundBy && (
                           <div className="animate-[fadeIn_0.5s_ease-out]">
                             <ProfileMiniCard
                               title="Found by"

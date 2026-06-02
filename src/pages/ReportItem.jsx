@@ -316,11 +316,12 @@ function ReportItem() {
                     </label>
 
                     <input
-                      type="file"
-                      accept="image/png,image/jpeg"
-                      className="hidden"
-                      ref={fileInputRef}
-                      onChange={handleImageChange}
+                      type="text"
+                      name="title"
+                      value={formData.title}
+                      onChange={handleInputChange}
+                      placeholder="Example: Kunci Kost, Dompet Hitam, Laptop Asus..."
+                      className="w-full bg-[#0E1511] border border-[#3C4A42] rounded-xl px-4 py-3 text-[#DDE4DD] placeholder:text-[#657066] outline-none focus:border-[#9CC88D]"
                     />
                   </div>
 

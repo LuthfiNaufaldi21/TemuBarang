@@ -300,7 +300,7 @@ function Dashboard({ hasNotification = false }) {
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
         <TopBar hasNotification={hasNotification} />
 
-        <main className="flex-1 overflow-y-auto p-6 md:p-8">
+        <main className="flex-1 overflow-y-auto p-4 md:p-8 pb-28 md:pb-8">
           <div className="bg-[#164A41]/40 border border-[#4D774E]/20 rounded-3xl p-8 md:p-10 relative overflow-hidden backdrop-blur-sm">
             <div className="absolute -top-32 -right-20 w-64 h-64 bg-[#164A41] rounded-full blur-2xl opacity-60"></div>
 
