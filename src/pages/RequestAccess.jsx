@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { isUSUEmail } from "../utils/validateEmail";
 
 function RequestAccess() {
   const [isLoading, setIsLoading] = useState(false);
@@ -20,7 +21,7 @@ function RequestAccess() {
     const password = formData.get("password");
 
     // Validasi email USU
-    if (!email.endsWith("@usu.ac.id")) {
+    if (!isUSUEmailemail(email)) {
       setStatus("error");
       setMessage("Please use your official USU email address (@usu.ac.id).");
       setIsLoading(false);

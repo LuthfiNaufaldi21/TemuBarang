@@ -249,7 +249,6 @@ function ConfirmFound() {
 
   const [formData, setFormData] = useState({
     foundLocation: "",
-    storageLocation: "Pos Satpam Pintu 1 USU",
     notes: "",
   });
 
@@ -297,8 +296,8 @@ function ConfirmFound() {
       return;
     }
 
-    if (!formData.foundLocation.trim() || !formData.storageLocation.trim()) {
-      alert("Please fill all required fields.");
+    if (!formData.foundLocation.trim()) {
+      alert("Please fill where you found it.");
       return;
     }
 
@@ -352,7 +351,6 @@ function ConfirmFound() {
         finderName: userData.name,
         foundAt: now,
         foundLocation: formData.foundLocation.trim(),
-        storageLocation: formData.storageLocation.trim(),
         notes: formData.notes.trim(),
         status: "match_found",
       };

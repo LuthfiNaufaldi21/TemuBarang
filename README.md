@@ -1,16 +1,87 @@
-# React + Vite
+# TemuBarang
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+TemuBarang adalah aplikasi web berbasis React yang dirancang untuk membantu civitas akademika Universitas Sumatera Utara (USU) dalam melaporkan, mencari, dan mengelola barang hilang maupun barang ditemukan secara lebih terpusat, cepat, dan aman.
 
-Currently, two official plugins are available:
+Aplikasi ini dibuat sebagai prototype sistem Lost & Found digital di lingkungan kampus. Pengguna dapat membuat laporan barang hilang atau ditemukan, melihat daftar laporan terbaru, membuka detail barang, melakukan komunikasi melalui fitur pesan, serta menerima notifikasi kemungkinan kecocokan barang.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Fitur Utama
 
-## React Compiler
+### 1. Landing Page
+Halaman awal aplikasi yang menampilkan informasi umum tentang TemuBarang dan ajakan untuk menggunakan sistem.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 2. Login dan Request Access
+Pengguna dapat masuk menggunakan identitas seperti NIM, NIP, atau email institusi USU. Tersedia juga halaman request access untuk pengajuan akun.
 
-## Expanding the ESLint configuration
+### 3. Dashboard
+Menampilkan ringkasan informasi utama, laporan terbaru, dan navigasi ke fitur-fitur penting aplikasi.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### 4. Pelaporan Barang Hilang dan Ditemukan
+Pengguna dapat membuat laporan barang hilang atau barang ditemukan dengan mengisi data seperti:
+
+- Nama barang
+- Kategori barang
+- Lokasi kehilangan atau penemuan
+- Tanggal kejadian
+- Deskripsi barang
+- Foto barang
+
+### 5. Daftar Barang Hilang dan Ditemukan
+Aplikasi menyediakan halaman khusus untuk melihat daftar barang hilang dan daftar barang ditemukan.
+
+### 6. Detail Barang
+Pengguna dapat melihat informasi lengkap dari sebuah laporan barang, termasuk foto, status, lokasi, deskripsi, dan informasi pelapor.
+
+### 7. Smart Matching Prototype
+Sistem memiliki fitur pencocokan sederhana untuk membantu menemukan kemungkinan hubungan antara laporan barang hilang dan barang ditemukan.
+
+Pada versi saat ini, fitur matching masih bersifat prototype dan menggunakan pemrosesan lokal/rule-based, belum sepenuhnya terhubung dengan layanan AI eksternal.
+
+### 8. Chat Privat
+Pengguna dapat melakukan komunikasi melalui halaman pesan untuk membahas detail barang yang berkaitan dengan laporan tertentu.
+
+### 9. Notifikasi
+Aplikasi memiliki halaman notifikasi untuk menampilkan informasi seperti potensi kecocokan barang atau pesan baru.
+
+### 10. Profil dan Pengaturan
+Pengguna dapat melihat dan mengubah informasi profil serta mengakses halaman pengaturan aplikasi.
+
+## Tech Stack
+
+Project ini menggunakan teknologi berikut:
+
+- React
+- Vite
+- React Router DOM
+- Tailwind CSS
+- LocalStorage untuk penyimpanan data prototype
+
+## Struktur Folder
+
+```text
+TemuBarang/
+├── public/
+├── src/
+│   ├── assets/
+│   ├── components/
+│   │   ├── Sidebar.jsx
+│   │   └── TopBar.jsx
+│   ├── pages/
+│   │   ├── LandingPage.jsx
+│   │   ├── Login.jsx
+│   │   ├── Dashboard.jsx
+│   │   ├── ReportItem.jsx
+│   │   ├── LostItems.jsx
+│   │   ├── FoundItems.jsx
+│   │   ├── ItemDetail.jsx
+│   │   ├── Messages.jsx
+│   │   ├── ChatRoom.jsx
+│   │   ├── Notifications.jsx
+│   │   ├── Profile.jsx
+│   │   └── Settings.jsx
+│   ├── utils/
+│   ├── App.jsx
+│   ├── main.jsx
+│   └── index.css
+├── package.json
+├── vite.config.js
+└── README.md

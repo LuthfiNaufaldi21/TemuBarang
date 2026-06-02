@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { isUSUEmail } from "../utils/validateEmail";
 
 function ForgotPassword() {
   const [status, setStatus] = useState(null); // "success"/ "error"/ null
@@ -16,7 +17,7 @@ function ForgotPassword() {
     const email = formData.get("email");
 
     // Validasi khusus email mahasiswa USU
-    if (!email.endsWith("@usu.ac.id")) {
+    if (!isUSUEmail(email)) {
       setStatus("error");
       setMessage("Please use your official USU email address (@usu.ac.id).");
       setIsLoading(false);

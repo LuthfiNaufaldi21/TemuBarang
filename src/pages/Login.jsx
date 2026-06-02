@@ -1,5 +1,10 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import {
+  getUserRoleFromEmail,
+  isValidStudentNIM,
+  isValidStaffNIP,
+} from "../utils/validateEmail";
 
 function Login() {
   const [isLoading, setIsLoading] = useState(false);
@@ -20,38 +25,35 @@ function Login() {
       let role = "";
       let email = "";
 
-      // Logic like satu.usu.ac.id
-      if (identity.includes("@")) {
-        // Login via Email
-        if (identity.endsWith("@students.usu.ac.id")) {
-          role = "student";
-          email = identity;
-        } else if (identity.endsWith("@usu.ac.id")) {
-          role = "staff";
-          email = identity;
-        } else {
-          setError("Gunakan email institusi USU.");
-          setIsLoading(false);
-          return;
-        }
-      } else if (/^\d+$/.test(identity)) {
-        // Login via NIM or NIP (Numeric)
-        if (identity.length === 9) {
-          role = "student";
-          email = `${identity}@students.usu.ac.id`;
-        } else if (identity.length >= 8) {
-          role = "staff";
-          email = `${identity}@usu.ac.id`;
-        } else {
-          setError("Invalid NIM or NIP format.");
-          setIsLoading(false);
-          return;
-        }
-      } else {
-        setError("Invalid identity. Please enter NIM, NIP, or USU Email.");
+      // Logic login berdasarkan NIM, NIP, atau email institusi USU
+    if (identity.includes("@")) {
+      const normalizedEmail = identity.trim().toLowerCase();
+      role = getUserRoleFromEmail(normalizedEmail);
+
+      if (!role) {
+        setError("Gunakan email institusi USU.");
         setIsLoading(false);
         return;
       }
+
+      email = normalizedEmail;
+    } else if (/^\d+$/.test(identity)) {
+      if (isValidStudentNIM(identity)) {
+        role = "student";
+        email = `${identity}@students.usu.ac.id`;
+      } else if (isValidStaffNIP(identity)) {
+        role = "staff";
+        email = `${identity}@usu.ac.id`;
+      } else {
+        setError("NIM harus 9 digit atau NIP harus 18 digit.");
+        setIsLoading(false);
+        return;
+      }
+    } else {
+      setError("Invalid identity. Please enter NIM, NIP, or USU Email.");
+      setIsLoading(false);
+      return;
+    }
 
       // Simpan session login + role
       localStorage.setItem("currentUserEmail", email);

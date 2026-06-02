@@ -17,7 +17,6 @@ function ReportItem() {
     date: "",
     description: "",
     foundLocation: "",
-    storageLocation: "Pos Satpam Pintu 1 USU",
   });
 
   const readStorageArray = (key) => {
@@ -80,6 +79,21 @@ function ReportItem() {
 
     if (!file) return;
 
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    const allowedTypes = ["image/png", "image/jpeg"];
+
+    if (!allowedTypes.includes(file.type)) {
+      alert("Only PNG, JPG, or JPEG images are allowed.");
+      event.target.value = "";
+      return;
+    }
+
+    if (file.size > maxSize) {
+      alert("Image size must be less than 5MB.");
+      event.target.value = "";
+      return;
+    }
+
     const reader = new FileReader();
 
     reader.onloadend = () => {
@@ -115,11 +129,8 @@ function ReportItem() {
       return false;
     }
 
-    if (
-      reportType === "FOUND" &&
-      (!formData.foundLocation.trim() || !formData.storageLocation.trim())
-    ) {
-      alert("Please fill where you found it and where it is stored now.");
+    if (reportType === "FOUND" && !formData.foundLocation.trim()) {
+      alert("Please fill where you found it.");
       return false;
     }
 
@@ -152,9 +163,7 @@ function ReportItem() {
     const currentUser = getCurrentUserProfile();
 
     const itemLocation =
-      reportType === "FOUND"
-        ? formData.storageLocation || formData.foundLocation
-        : formData.location;
+      reportType === "FOUND" ? formData.foundLocation : formData.location;
 
     const reportImage = imagePreview;
 
@@ -179,8 +188,8 @@ function ReportItem() {
       foundLocation:
         reportType === "FOUND" ? formData.foundLocation.trim() : undefined,
 
-      storageLocation:
-        reportType === "FOUND" ? formData.storageLocation.trim() : undefined,
+      foundLocation:
+        reportType === "FOUND" ? formData.foundLocation.trim() : undefined,
 
       potentialFounders: [],
       createdAt: now,
@@ -206,9 +215,9 @@ function ReportItem() {
         }.`,
       time: "Just now",
       place:
-        reportType === "FOUND"
-          ? formData.storageLocation.trim()
-          : formData.location.trim(),
+      reportType === "FOUND"
+        ? formData.foundLocation.trim()
+        : formData.location.trim(),
       createdAt: now,
     };
 
@@ -307,13 +316,11 @@ function ReportItem() {
                     </label>
 
                     <input
-                      type="text"
-                      name="title"
-                      value={formData.title}
-                      onChange={handleInputChange}
-                      placeholder="e.g. Silver Macbook Pro"
-                      className="w-full bg-[#0E1511] border border-[#3C4A42] rounded-xl py-3 px-4 text-[#DDE4DD] placeholder:text-gray-600 focus:outline-none focus:border-[#9CC88D] transition-colors"
-                      required
+                      type="file"
+                      accept="image/png,image/jpeg"
+                      className="hidden"
+                      ref={fileInputRef}
+                      onChange={handleImageChange}
                     />
                   </div>
 
@@ -484,7 +491,11 @@ function ReportItem() {
                       name="description"
                       value={formData.description}
                       onChange={handleInputChange}
-                      placeholder="Mention any distinguishing features like stickers, scratches, or protective cases..."
+                      placeholder={
+                        reportType === "FOUND"
+                          ? "Mention item details and where you deposited it, e.g. already left at Fasilkom-TI security post."
+                          : "Mention any distinguishing features like stickers, scratches, or protective cases..."
+                      }
                       className="w-full h-32 bg-[#0E1511] border border-[#3C4A42] rounded-xl py-3 px-4 text-[#DDE4DD] placeholder:text-gray-600 focus:outline-none focus:border-[#9CC88D] transition-colors resize-none"
                       required
                     />
