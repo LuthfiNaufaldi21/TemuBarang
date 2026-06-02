@@ -24,6 +24,11 @@ import EditItemReport from "./pages/EditItemReport";
 import CloseReport from "./pages/CloseReport";
 import Notifications from "./pages/Notifications";
 import Settings from "./pages/Settings";
+import Watchlist from "./pages/Watchlist";
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminRoute from "./components/AdminRoute";
+import HelpCenter from "./pages/HelpCenter";
+import NotFound from "./pages/NotFound";
 
 function App() {
   return (
@@ -34,6 +39,14 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/request-access" element={<RequestAccess />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <AdminDashboard />
+            </AdminRoute>
+          }
+        />
         <Route path="/profile" element={<Profile />} />
         <Route path="/edit-profile" element={<EditProfile />} />
         <Route path="/recent-reports" element={<RecentReports />} />
@@ -43,6 +56,7 @@ function App() {
         <Route path="/success-process" element={<SuccessProcess />} />
         <Route path="/lost-items" element={<LostItems />} />
         <Route path="/found-items" element={<FoundItems />} />
+        <Route path="/watchlist" element={<Watchlist />} />
         <Route path="/messages" element={<Messages />} />
         <Route path="/messages/:conversationId" element={<ChatRoom />} />
         <Route path="/my-reports" element={<MyReports />} />
@@ -52,6 +66,9 @@ function App() {
         <Route path="/close-report/:id" element={<CloseReport />} />
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/help" element={<HelpCenter />} />
+
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   );

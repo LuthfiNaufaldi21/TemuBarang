@@ -56,6 +56,9 @@ function Login() {
     }
 
       // Simpan session login + role
+      if (email === "admin@usu.ac.id") {
+        role = "admin";
+      }
       localStorage.setItem("currentUserEmail", email);
       localStorage.setItem("currentUserRole", role);
       localStorage.setItem("currentUserIdentity", identity);

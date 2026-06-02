@@ -9,6 +9,12 @@ const NAV_LINKS = [
     icon: "M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z",
   },
   {
+    to: "/admin",
+    key: "admin",
+    label: "Admin",
+    icon: "M9 17v-2a4 4 0 014-4h4m0 0V7m0 4h-4m-6 8H5a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v2",
+  },
+  {
     to: "/lost-items",
     key: "lost-items",
     label: "Lost Items",
@@ -32,6 +38,13 @@ const NAV_LINKS = [
     label: "Messages",
     icon: "M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z",
   },
+  {
+    to: "/watchlist",
+    key: "watchlist",
+    label: "Watchlist",
+    icon: "M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z",
+  },
+
 ];
 
 function normalizeEmail(email) {
@@ -101,11 +114,10 @@ function getCurrentUserData() {
 function Sidebar({ activePage = "" }) {
   const navigate = useNavigate();
 
+  const currentUserRole = localStorage.getItem("currentUserRole");
+
   const [userData, setUserData] = useState(() => getCurrentUserData());
   const [hasUnreadMessage, setHasUnreadMessage] = useState(false);
-
-  const displayName = userData.name;
-  const hasAvatar = Boolean(userData.avatarUrl);
 
   const checkUnreadMessages = useCallback(() => {
     const currentUserEmail = normalizeEmail(
@@ -194,6 +206,9 @@ function Sidebar({ activePage = "" }) {
     navigate("/login");
   };
 
+  const displayName = userData.name || "Student";
+  const hasAvatar = Boolean(userData.avatarUrl);
+
   return (
     <aside className="hidden md:flex flex-col w-[256px] bg-[#0E1511] border-r border-[#3C4A42]/30 shrink-0 z-20 shadow-[4px_0px_24px_rgba(0,0,0,0.18)]">
       <div className="p-6 border-b border-[#3C4A42]/30">
@@ -258,7 +273,13 @@ function Sidebar({ activePage = "" }) {
       </div>
 
       <nav className="flex-1 overflow-y-auto px-2 space-y-1 mt-2">
-        {NAV_LINKS.map((link) => {
+        {NAV_LINKS.filter((link) => {
+          if (link.key === "admin") {
+            return currentUserRole === "admin";
+          }
+
+          return true;
+        }).map((link) => {
           const isActive = link.key === activePage;
           const showIndicator = link.key === "messages" && hasUnreadMessage;
 
@@ -266,10 +287,11 @@ function Sidebar({ activePage = "" }) {
             <Link
               key={link.to}
               to={link.to}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors relative group ${isActive
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors relative group ${
+                isActive
                   ? "bg-[#1A211D] text-[#9CC88D] border-r-4 border-[#9CC88D]"
                   : "text-[#86948A] hover:bg-[#1A211D] hover:text-[#DDE4DD]"
-                }`}
+              }`}
             >
               <svg
                 className="w-5 h-5 shrink-0"
