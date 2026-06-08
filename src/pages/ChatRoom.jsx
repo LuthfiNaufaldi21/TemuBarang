@@ -1,14 +1,19 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import { chatAPI } from "../services/api";
 import { useAuth } from "../context/AuthContext";
+import { useChat } from "../hooks/useChat";
 
 function formatMessageTime(isoString) {
   if (!isoString) return "";
   const date = new Date(isoString);
   if (isNaN(date.getTime())) return "";
-  return date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true });
+  return date.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  });
 }
 
 function formatDateLabel(isoString) {
@@ -18,7 +23,11 @@ function formatDateLabel(isoString) {
   const diffDays = Math.floor((now - date) / 86400000);
   if (diffDays === 0) return "Today";
   if (diffDays === 1) return "Yesterday";
-  return date.toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" });
+  return date.toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "short",
+    day: "numeric",
+  });
 }
 
 function groupByDate(messages) {
@@ -29,7 +38,11 @@ function groupByDate(messages) {
     const dateKey = new Date(safeDate).toDateString();
     if (dateKey !== currentDate) {
       currentDate = dateKey;
-      groups.push({ type: "date", label: formatDateLabel(safeDate), key: dateKey });
+      groups.push({
+        type: "date",
+        label: formatDateLabel(safeDate),
+        key: dateKey,
+      });
     }
     groups.push({ type: "message", ...msg });
   });
@@ -40,8 +53,55 @@ function getMyId() {
   try {
     const token = localStorage.getItem("token");
     if (!token) return null;
-    return JSON.parse(atob(token.split(".")[1])).sub || null;
-  } catch { return null; }
+    // JWT pakai base64URL (karakter - dan _), atob() biasa tidak bisa handle
+    const b64 = token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
+    return JSON.parse(atob(b64)).sub || null;
+  } catch {
+    return null;
+  }
+}
+
+/** Badge status koneksi WebSocket */
+function WsStatusBadge({ status }) {
+  const map = {
+    connected: { dot: "bg-[#9CC88D]", text: "Online" },
+    connecting: {
+      dot: "bg-yellow-400 animate-pulse",
+      text: "Menghubungkan...",
+    },
+    reconnecting: {
+      dot: "bg-yellow-400 animate-pulse",
+      text: "Reconnecting...",
+    },
+    failed: { dot: "bg-red-500", text: "Offline" },
+  };
+  const cfg = map[status] || map.connecting;
+  return (
+    <span className="flex items-center gap-1.5">
+      <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${cfg.dot}`} />
+      <span className="text-[#86948A] text-xs">{cfg.text}</span>
+    </span>
+  );
+}
+
+/** Animasi titik-titik "sedang mengetik" */
+function TypingIndicator({ name }) {
+  return (
+    <div className="flex items-end gap-2 mb-1">
+      <div className="w-7 h-7 rounded-full bg-[#164A41] border border-[#4D774E] flex items-center justify-center text-[10px] font-bold text-[#9CC88D] shrink-0 mb-1">
+        {name.substring(0, 2).toUpperCase()}
+      </div>
+      <div className="px-4 py-3 rounded-2xl rounded-bl-sm bg-[#1E2820] border border-[#3C4A42]/50 flex items-center gap-1.5">
+        {[0, 150, 300].map((delay) => (
+          <span
+            key={delay}
+            className="w-1.5 h-1.5 rounded-full bg-[#86948A] animate-bounce"
+            style={{ animationDelay: `${delay}ms` }}
+          />
+        ))}
+      </div>
+    </div>
+  );
 }
 
 export default function ChatRoom() {
@@ -60,66 +120,153 @@ export default function ChatRoom() {
   const inputRef = useRef(null);
   const menuRef = useRef(null);
 
+  // Tracking ID pesan untuk deduplikasi
+  const messageIdsRef = useRef(new Set());
+
+  // ─── Load awal via REST ────────────────────────────────────────────────────
   const load = useCallback(async () => {
     try {
       const [roomsData, msgsData] = await Promise.all([
         chatAPI.getRooms(),
         chatAPI.getMessages(roomId),
       ]);
-      const currentRoom = (roomsData.rooms || []).find((r) => r.room_id == roomId);
+      const currentRoom = (roomsData.rooms || []).find(
+        (r) => r.room_id == roomId,
+      );
       setRoom(currentRoom || null);
-      setMessages(msgsData.messages || []);
-    } catch {}
-    finally { setLoading(false); }
+      const msgs = msgsData.messages || [];
+      setMessages(msgs);
+      messageIdsRef.current = new Set(msgs.map((m) => m.message_id));
+    } catch {
+      // error diabaikan, loading tetap selesai
+    } finally {
+      setLoading(false);
+    }
   }, [roomId]);
 
-  useEffect(() => { load(); }, [load]);
-  useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
+  useEffect(() => {
+    load();
+  }, [load]);
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   useEffect(() => {
     if (!menuMsgId) return;
     const handler = (e) => {
-      if (menuRef.current && !menuRef.current.contains(e.target)) setMenuMsgId(null);
+      if (menuRef.current && !menuRef.current.contains(e.target))
+        setMenuMsgId(null);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, [menuMsgId]);
 
-  const otherName = room
-    ? (myId === room.initiator_id ? room.post_owner?.full_name : room.initiator?.full_name) || "Unknown"
-    : "Unknown";
-  const otherInitial = otherName.substring(0, 2).toUpperCase();
+  // ─── WebSocket: terima pesan baru ─────────────────────────────────────────
+  const handleWsMessage = useCallback((message) => {
+    if (!message?.message_id) return;
+    if (messageIdsRef.current.has(message.message_id)) return;
+    messageIdsRef.current.add(message.message_id);
+    setMessages((prev) => [...prev, message]);
+  }, []);
 
+  // ─── WebSocket: pesan dihapus ─────────────────────────────────────────────
+  const handleWsDeleted = useCallback(
+    ({ message_id, deleted_for }) => {
+      if (deleted_for === "everyone") {
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.message_id === message_id
+              ? {
+                  ...m,
+                  message_body: "🚫 Pesan ini telah dihapus",
+                  deleted_for: "everyone",
+                }
+              : m,
+          ),
+        );
+      } else if (deleted_for === myId) {
+        setMessages((prev) => prev.filter((m) => m.message_id !== message_id));
+        messageIdsRef.current.delete(message_id);
+      }
+    },
+    [myId],
+  );
+
+  const { wsStatus, otherTyping, sendViaWs, sendTyping } = useChat({
+    roomId,
+    myId,
+    onMessage: handleWsMessage,
+    onMessageDeleted: handleWsDeleted,
+  });
+
+  // ─── Typing indicator ─────────────────────────────────────────────────────
+  const typingTimeoutRef = useRef(null);
+  const handleInputChange = (e) => {
+    setInputText(e.target.value);
+    sendTyping(true);
+    clearTimeout(typingTimeoutRef.current);
+    typingTimeoutRef.current = setTimeout(() => sendTyping(false), 2000);
+  };
+
+  // ─── Kirim pesan ──────────────────────────────────────────────────────────
   const handleSend = async () => {
     const text = inputText.trim();
     if (!text) return;
     setSending(true);
-    try {
-      const data = await chatAPI.sendMessage(roomId, text);
-      setMessages((prev) => [...prev, data.message]);
+    sendTyping(false);
+    clearTimeout(typingTimeoutRef.current);
+
+    const sentViaWs = sendViaWs(text);
+
+    if (sentViaWs) {
       setInputText("");
       setTimeout(() => inputRef.current?.focus(), 0);
-    } catch (err) {
-      alert(err.message);
-    } finally {
       setSending(false);
+    } else {
+      try {
+        const data = await chatAPI.sendMessage(roomId, text);
+        const newMsg = data.message;
+        if (newMsg && !messageIdsRef.current.has(newMsg.message_id)) {
+          messageIdsRef.current.add(newMsg.message_id);
+          setMessages((prev) => [...prev, newMsg]);
+        }
+        setInputText("");
+        setTimeout(() => inputRef.current?.focus(), 0);
+      } catch (err) {
+        alert(err.message);
+      } finally {
+        setSending(false);
+      }
     }
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); }
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
   };
 
+  // ─── Hapus pesan ─────────────────────────────────────────────────────────
   const handleDelete = async (messageId, deleteFor) => {
     setMenuMsgId(null);
     try {
       await chatAPI.deleteMessage(roomId, messageId, deleteFor);
       if (deleteFor === "everyone") {
-        setMessages((prev) => prev.map((m) =>
-          m.message_id === messageId ? { ...m, message_body: "🚫 Pesan ini telah dihapus", deleted_for: "everyone" } : m
-        ));
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.message_id === messageId
+              ? {
+                  ...m,
+                  message_body: "🚫 Pesan ini telah dihapus",
+                  deleted_for: "everyone",
+                }
+              : m,
+          ),
+        );
       } else {
         setMessages((prev) => prev.filter((m) => m.message_id !== messageId));
+        messageIdsRef.current.delete(messageId);
       }
     } catch (err) {
       alert(err.message);
@@ -137,57 +284,99 @@ export default function ChatRoom() {
   if (!room) {
     return (
       <div className="flex flex-col h-screen bg-[#0E1511] items-center justify-center gap-4 text-white">
-        <h2 className="text-2xl font-bold text-[#DDE4DD]">Conversation not found</h2>
-        <button onClick={() => navigate("/messages")} className="px-6 py-2 bg-[#164A41] rounded-lg">Back to Messages</button>
+        <h2 className="text-2xl font-bold text-[#DDE4DD]">
+          Conversation not found
+        </h2>
+        <button
+          onClick={() => navigate("/messages")}
+          className="px-6 py-2 bg-[#164A41] rounded-lg"
+        >
+          Back to Messages
+        </button>
       </div>
     );
   }
 
+  const otherName = room
+    ? (myId === room.initiator_id
+        ? room.post_owner?.full_name
+        : room.initiator?.full_name) || "Unknown"
+    : "Unknown";
+  const otherInitial = otherName.substring(0, 2).toUpperCase();
   const allItems = groupByDate(messages);
 
   return (
     <div className="flex h-screen bg-[#0E1511] text-white overflow-hidden">
       <Sidebar activePage="messages" />
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
-
         {/* Header */}
         <div className="bg-[#1A211D] border-b border-[#27272A] px-4 py-3 flex items-center gap-3 shrink-0">
-          <button onClick={() => navigate("/messages")}
-            className="w-9 h-9 rounded-lg flex items-center justify-center text-[#86948A] hover:text-[#DDE4DD] hover:bg-[#164A41]/40 transition-all shrink-0">
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          <button
+            onClick={() => navigate("/messages")}
+            className="w-9 h-9 rounded-lg flex items-center justify-center text-[#86948A] hover:text-[#DDE4DD] hover:bg-[#164A41]/40 transition-all shrink-0"
+          >
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
             </svg>
           </button>
           <div className="w-9 h-9 rounded-full bg-[#164A41] border border-[#4D774E] flex items-center justify-center text-sm font-bold text-[#9CC88D] shrink-0">
             {otherInitial}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-[#DDE4DD] text-sm font-semibold leading-tight truncate">{otherName}</p>
-            <p className="text-[#86948A] text-xs">Student Portal</p>
+            <p className="text-[#DDE4DD] text-sm font-semibold leading-tight truncate">
+              {otherName}
+            </p>
+            <WsStatusBadge status={wsStatus} />
           </div>
         </div>
 
         {/* Item context bar */}
         {room.posts && (
-          <button type="button" onClick={() => navigate(`/item/${room.posts.post_id}`)}
-            className="bg-[#0E1511] border-b border-[#27272A]/50 px-6 py-2.5 flex items-center gap-3 text-left hover:bg-[#101A13] transition-colors">
+          <button
+            type="button"
+            onClick={() => navigate(`/item/${room.posts.post_id}`)}
+            className="bg-[#0E1511] border-b border-[#27272A]/50 px-6 py-2.5 flex items-center gap-3 text-left hover:bg-[#101A13] transition-colors"
+          >
             {room.posts.item_image && (
-              <img src={room.posts.item_image} alt={room.posts.caption}
-                className="w-8 h-8 rounded-md object-cover border border-[#3C4A42]" />
+              <img
+                src={room.posts.item_image}
+                alt={room.posts.caption}
+                className="w-8 h-8 rounded-md object-cover border border-[#3C4A42]"
+              />
             )}
             <span className="text-[#86948A] text-xs truncate">
-              Regarding: <span className="text-[#DDE4DD] font-medium">{room.posts.caption}</span>
+              Regarding:{" "}
+              <span className="text-[#DDE4DD] font-medium">
+                {room.posts.caption}
+              </span>
             </span>
           </button>
         )}
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-1"
-          style={{ backgroundImage: "radial-gradient(circle at 20% 80%, rgba(22,74,65,0.08) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(156,200,141,0.04) 0%, transparent 50%)" }}>
+        <div
+          className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-1"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle at 20% 80%, rgba(22,74,65,0.08) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(156,200,141,0.04) 0%, transparent 50%)",
+          }}
+        >
           {messages.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center gap-4 py-20">
               <div className="text-center">
-                <p className="text-[#86948A] text-base font-medium">Start the conversation</p>
+                <p className="text-[#86948A] text-base font-medium">
+                  Start the conversation
+                </p>
               </div>
             </div>
           ) : (
@@ -196,74 +385,101 @@ export default function ChatRoom() {
                 return (
                   <div key={item.key} className="flex items-center gap-4 my-4">
                     <div className="flex-1 h-px bg-[#27272A]" />
-                    <span className="text-[#3C4A42] text-xs font-semibold tracking-wide px-3 py-1 bg-[#1A211D] rounded-full border border-[#27272A]">{item.label}</span>
+                    <span className="text-[#3C4A42] text-xs font-semibold tracking-wide px-3 py-1 bg-[#1A211D] rounded-full border border-[#27272A]">
+                      {item.label}
+                    </span>
                     <div className="flex-1 h-px bg-[#27272A]" />
                   </div>
                 );
               }
 
-              // FILTER: Jangan render pesan jika UUID kita ada di array deleted_for (Hapus untuk saya)
-              if (item.deleted_for && Array.isArray(item.deleted_for) && item.deleted_for.includes(myId)) {
+              // Jangan render jika sudah dihapus untuk saya
+              if (
+                item.deleted_for &&
+                Array.isArray(item.deleted_for) &&
+                item.deleted_for.includes(myId)
+              ) {
                 return null;
               }
 
-              const isMe = item.sender_id === myId;
-
-              // Cek apakah pesan telah ditarik untuk semua orang
-              const isDeleted = item.message_body === "🚫 Pesan ini telah dihapus" || item.deleted_for === "everyone";
+              const isMe = String(item.sender_id) === String(myId);
+              const isDeleted =
+                item.message_body === "🚫 Pesan ini telah dihapus" ||
+                item.deleted_for === "everyone";
               const isMenuOpen = menuMsgId === item.message_id;
 
               return (
-                <div key={item.message_id || idx}
-                  className={`flex items-end gap-2 mb-1 group ${isMe ? "flex-row-reverse" : "flex-row"}`}>
-
+                <div
+                  key={item.message_id || idx}
+                  className={`flex items-end gap-2 mb-1 group ${isMe ? "flex-row-reverse" : "flex-row"}`}
+                >
                   {!isMe && (
                     <div className="w-7 h-7 rounded-full bg-[#164A41] border border-[#4D774E] flex items-center justify-center text-[10px] font-bold text-[#9CC88D] shrink-0 mb-1">
                       {otherInitial}
                     </div>
                   )}
 
-                  <div className={`max-w-[70%] flex flex-col gap-1 ${isMe ? "items-end" : "items-start"}`}>
-                    <div className={`flex items-center gap-1 ${isMe ? "flex-row-reverse" : "flex-row"}`}>
-
+                  <div
+                    className={`max-w-[70%] flex flex-col gap-1 ${isMe ? "items-end" : "items-start"}`}
+                  >
+                    <div
+                      className={`flex items-center gap-1 ${isMe ? "flex-row-reverse" : "flex-row"}`}
+                    >
                       {/* Bubble Chat */}
-                      <div className={`px-4 py-2.5 rounded-2xl text-sm leading-relaxed break-words ${
-                        isDeleted
-                          ? "bg-[#1A211D] border border-[#3C4A42]/30 text-[#4D5C50] italic"
-                          : isMe
-                            ? "bg-[#164A41] text-[#DDE4DD] rounded-br-sm"
-                            : "bg-[#1E2820] border border-[#3C4A42]/50 text-[#DDE4DD] rounded-bl-sm"
-                      }`}>
-                        {isDeleted ? "🚫 Pesan ini telah dihapus" : item.message_body}
+                      <div
+                        className={`px-4 py-2.5 rounded-2xl text-sm leading-relaxed break-words ${
+                          isDeleted
+                            ? "bg-[#1A211D] border border-[#3C4A42]/30 text-[#4D5C50] italic"
+                            : isMe
+                              ? "bg-[#164A41] text-[#DDE4DD] rounded-br-sm"
+                              : "bg-[#1E2820] border border-[#3C4A42]/50 text-[#DDE4DD] rounded-bl-sm"
+                        }`}
+                      >
+                        {isDeleted
+                          ? "🚫 Pesan ini telah dihapus"
+                          : item.message_body}
                       </div>
 
-                      {/* Tombol Titik Tiga (Opsi Hapus) */}
+                      {/* Tombol opsi hapus */}
                       {!isDeleted && (
                         <div className="relative">
                           <button
-                            onClick={() => setMenuMsgId(isMenuOpen ? null : item.message_id)}
-                            className="opacity-0 group-hover:opacity-100 transition-opacity w-6 h-6 flex items-center justify-center rounded-full hover:bg-white/10 text-[#86948A]">
-                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                              <circle cx="5" cy="12" r="1.5" /><circle cx="12" cy="12" r="1.5" /><circle cx="19" cy="12" r="1.5" />
+                            onClick={() =>
+                              setMenuMsgId(isMenuOpen ? null : item.message_id)
+                            }
+                            className="opacity-0 group-hover:opacity-100 transition-opacity w-6 h-6 flex items-center justify-center rounded-full hover:bg-white/10 text-[#86948A]"
+                          >
+                            <svg
+                              className="w-4 h-4"
+                              fill="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <circle cx="5" cy="12" r="1.5" />
+                              <circle cx="12" cy="12" r="1.5" />
+                              <circle cx="19" cy="12" r="1.5" />
                             </svg>
                           </button>
 
-                          {/* Dropdown Menu Hapus */}
                           {isMenuOpen && (
-                            <div ref={menuRef}
-                              className={`absolute z-50 bottom-8 ${isMe ? "right-0" : "left-0"} w-48 bg-[#1E2820] border border-[#3C4A42] rounded-xl shadow-2xl overflow-hidden`}>
-
+                            <div
+                              ref={menuRef}
+                              className={`absolute z-50 bottom-8 ${isMe ? "right-0" : "left-0"} w-48 bg-[#1E2820] border border-[#3C4A42] rounded-xl shadow-2xl overflow-hidden`}
+                            >
                               <button
-                                onClick={() => handleDelete(item.message_id, "me")}
-                                className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[#A1A1AA] hover:bg-white/5 hover:text-[#DDE4DD] transition-colors">
+                                onClick={() =>
+                                  handleDelete(item.message_id, "me")
+                                }
+                                className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[#A1A1AA] hover:bg-white/5 hover:text-[#DDE4DD] transition-colors"
+                              >
                                 Hapus untuk saya
                               </button>
-
-                              {/* Hapus untuk semua (HANYA MUNCUL JIKA KITA PENGIRIMNYA / isMe = true) */}
                               {isMe && (
                                 <button
-                                  onClick={() => handleDelete(item.message_id, "everyone")}
-                                  className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[#FFB4AB] hover:bg-red-500/10 transition-colors border-t border-[#3C4A42]">
+                                  onClick={() =>
+                                    handleDelete(item.message_id, "everyone")
+                                  }
+                                  className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[#FFB4AB] hover:bg-red-500/10 transition-colors border-t border-[#3C4A42]"
+                                >
                                   Hapus untuk semua
                                 </button>
                               )}
@@ -273,7 +489,9 @@ export default function ChatRoom() {
                       )}
                     </div>
 
-                    <span className="text-[#3C4A42] text-[10px] px-1">{formatMessageTime(item.sent_at)}</span>
+                    <span className="text-[#3C4A42] text-[10px] px-1">
+                      {formatMessageTime(item.sent_at)}
+                    </span>
                   </div>
 
                   {isMe && <div className="w-7 shrink-0" />}
@@ -281,17 +499,21 @@ export default function ChatRoom() {
               );
             })
           )}
+
+          {/* Typing indicator */}
+          {otherTyping && <TypingIndicator name={otherName} />}
+
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Input Text Area */}
+        {/* Input */}
         <div className="bg-[#1A211D] border-t border-[#27272A] px-4 py-3 shrink-0">
           <div className="flex items-end gap-2">
             <div className="flex-1">
               <textarea
                 ref={inputRef}
                 value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
+                onChange={handleInputChange}
                 onKeyDown={handleKeyDown}
                 placeholder={`Message ${otherName}...`}
                 rows={1}
@@ -310,14 +532,24 @@ export default function ChatRoom() {
                 inputText.trim() && !sending
                   ? "bg-[#9CC88D] hover:bg-[#8bb47d] text-[#13342E] hover:scale-105"
                   : "bg-[#27272A] text-[#3C4A42] cursor-not-allowed"
-              }`}>
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+              }`}
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2.5}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+                />
               </svg>
             </button>
           </div>
         </div>
-
       </div>
     </div>
   );

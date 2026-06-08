@@ -5,7 +5,9 @@ const AuthContext = createContext(null);
 
 function getUserIdFromToken(token) {
   try {
-    const payload = JSON.parse(atob(token.split(".")[1]));
+    // JWT pakai base64URL (ada karakter - dan _), atob() biasa tidak bisa handle
+    const b64 = token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
+    const payload = JSON.parse(atob(b64));
     return payload.sub || null;
   } catch {
     return null;
