@@ -4,18 +4,25 @@ import { wsService } from "../services/websocket";
 /**
  * useChat — Hook untuk real-time chat di dalam satu room.
  *
- * @param {string|number} roomId   — ID room yang sedang dibuka
- * @param {string}        myId     — ID user yang login
- * @param {Function}      onMessage        — callback(message) saat pesan baru masuk dari WS
- * @param {Function}      onMessageDeleted — callback({ message_id, deleted_for })
- * @returns {{ wsReady, otherTyping, sendViaWs, sendTyping, wsStatus }}
+ * @param {string|number} roomId
+ * @param {string} myId
+ * @param {Function} onMessage
+ * @param {Function} onMessageDeleted
  */
-export function useChat({ roomId, myId, onMessage, onMessageDeleted }) {
+export function useChat({
+  roomId,
+  myId,
+  onMessage,
+  onMessageDeleted,
+}) {
   const [wsReady, setWsReady] = useState(wsService.isReady);
   const [wsStatus, setWsStatus] = useState(
     wsService.isReady ? "connected" : "connecting"
   );
   const [otherTyping, setOtherTyping] = useState(false);
+
+  // TAMBAHAN
+  const [lastError, setLastError] = useState(null);
 
   const typingTimerRef = useRef(null);
   const roomIdRef = useRef(roomId);
@@ -30,19 +37,25 @@ export function useChat({ roomId, myId, onMessage, onMessageDeleted }) {
       wsService.connect(token);
     }
 
-    const unsubOpen = wsService.on("ws_open", () => setWsStatus("connecting"));
+    const unsubOpen = wsService.on("ws_open", () =>
+      setWsStatus("connecting")
+    );
+
     const unsubReady = wsService.on("ws_ready", () => {
       setWsReady(true);
       setWsStatus("connected");
       wsService.joinRoom(roomIdRef.current);
     });
+
     const unsubClose = wsService.on("ws_close", () => {
       setWsReady(false);
       setWsStatus("reconnecting");
     });
-    const unsubFailed = wsService.on("ws_failed", () => setWsStatus("failed"));
 
-    // Jika sudah ready, langsung join room
+    const unsubFailed = wsService.on("ws_failed", () =>
+      setWsStatus("failed")
+    );
+
     if (wsService.isReady) {
       setWsReady(true);
       setWsStatus("connected");
@@ -51,22 +64,24 @@ export function useChat({ roomId, myId, onMessage, onMessageDeleted }) {
 
     return () => {
       wsService.leaveRoom(roomIdRef.current);
+
       unsubOpen();
       unsubReady();
       unsubClose();
       unsubFailed();
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomId]);
 
   // ── Listener pesan masuk ──────────────────────────────────────────────────
   useEffect(() => {
     const unsub = wsService.on("message", ({ room_id, message }) => {
       if (String(room_id) !== String(roomIdRef.current)) return;
+
       if (message && typeof onMessage === "function") {
         onMessage(message);
       }
     });
+
     return unsub;
   }, [onMessage]);
 
@@ -76,11 +91,13 @@ export function useChat({ roomId, myId, onMessage, onMessageDeleted }) {
       "message_deleted",
       ({ room_id, message_id, deleted_for }) => {
         if (String(room_id) !== String(roomIdRef.current)) return;
+
         if (typeof onMessageDeleted === "function") {
           onMessageDeleted({ message_id, deleted_for });
         }
       }
     );
+
     return unsub;
   }, [onMessageDeleted]);
 
@@ -95,6 +112,7 @@ export function useChat({ roomId, myId, onMessage, onMessageDeleted }) {
         setOtherTyping(is_typing);
 
         clearTimeout(typingTimerRef.current);
+
         if (is_typing) {
           typingTimerRef.current = setTimeout(
             () => setOtherTyping(false),
@@ -103,17 +121,32 @@ export function useChat({ roomId, myId, onMessage, onMessageDeleted }) {
         }
       }
     );
+
     return () => {
       unsub();
       clearTimeout(typingTimerRef.current);
     };
   }, [myId]);
 
+  // ── Listener error dari backend WS ────────────────────────────────────────
+  useEffect(() => {
+    const unsub = wsService.on("error", ({ message }) => {
+      setLastError(message || "Terjadi kesalahan");
+
+      setTimeout(() => {
+        setLastError(null);
+      }, 4000);
+    });
+
+    return unsub;
+  }, []);
+
   // ── API untuk komponen ────────────────────────────────────────────────────
 
   const sendViaWs = useCallback(
     (messageBody) => {
       if (!wsService.isReady) return false;
+
       wsService.sendMessage(roomId, messageBody);
       return true;
     },
@@ -129,5 +162,14 @@ export function useChat({ roomId, myId, onMessage, onMessageDeleted }) {
     [roomId]
   );
 
-  return { wsReady, wsStatus, otherTyping, sendViaWs, sendTyping };
+  return {
+    wsReady,
+    wsStatus,
+    otherTyping,
+    sendViaWs,
+    sendTyping,
+
+    // TAMBAHAN
+    lastError,
+  };
 }

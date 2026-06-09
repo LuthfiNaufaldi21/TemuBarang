@@ -18,15 +18,27 @@ function formatMessageTime(isoString) {
 
 function formatDateLabel(isoString) {
   if (!isoString) return "";
+
   const date = new Date(isoString);
-  const now = new Date();
-  const diffDays = Math.floor((now - date) / 86400000);
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const target = new Date(date);
+  target.setHours(0, 0, 0, 0);
+
+  const diffDays = Math.round(
+    (today - target) / (1000 * 60 * 60 * 24)
+  );
+
   if (diffDays === 0) return "Today";
   if (diffDays === 1) return "Yesterday";
+
   return date.toLocaleDateString("en-US", {
     weekday: "long",
     month: "short",
     day: "numeric",
+    year: "numeric",
   });
 }
 
@@ -179,7 +191,13 @@ export default function ChatRoom() {
     [myId]
   );
 
-  const { wsStatus, otherTyping, sendViaWs, sendTyping } = useChat({
+  const {
+  wsStatus,
+  otherTyping,
+  sendViaWs,
+  sendTyping,
+  lastError,
+  } = useChat({
     roomId,
     myId,
     onMessage: handleWsMessage,
@@ -435,7 +453,7 @@ export default function ChatRoom() {
                   <div className={`max-w-[70%] flex flex-col gap-1 ${isMe ? "items-end" : "items-start"}`}>
                     <div className={`flex items-center gap-1 ${isMe ? "flex-row-reverse" : "flex-row"}`}>
                       <div
-                        className={`px-4 py-2.5 rounded-2xl text-sm leading-relaxed break-words ${
+                        className={`px-4 py-2.5 rounded-2xl text-sm leading-relaxed break-all whitespace-pre-wrap overflow-hidden max-w-full ${
                           isDeleted
                             ? "bg-[#1A211D] border border-[#3C4A42]/30 text-[#4D5C50] italic"
                             : isMe
@@ -502,6 +520,11 @@ export default function ChatRoom() {
 
         {/* Input — disabled jika resolved */}
         <div className="bg-[#1A211D] border-t border-[#27272A] px-4 py-3 shrink-0">
+          {lastError && (
+            <div className="mb-2 px-3 py-2 text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg">
+              {lastError}
+            </div>
+        )}
           {isResolved ? (
             <div className="flex items-center justify-center py-2">
               <span className="text-[#3C4A42] text-xs">Chat ini sudah ditutup</span>
