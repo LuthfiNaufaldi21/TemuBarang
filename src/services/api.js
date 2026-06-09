@@ -44,6 +44,7 @@ export const postsAPI = {
         building_location: payload.location,
         detailed_location: payload.storage_location || null,
         occurrence_time: payload.date ? new Date(payload.date).toISOString() : null,
+        description: payload.description || null,
         item_image: payload.image_url || null,
       }),
     }),

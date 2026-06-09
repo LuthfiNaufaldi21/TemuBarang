@@ -137,6 +137,12 @@ export default function ItemDetail() {
                       <h4 className="text-[#86948A] text-xs font-semibold uppercase tracking-wide mb-2">Category</h4>
                       <p className="text-[#DDE4DD] text-base">{post.category || "Others"}</p>
                     </div>
+                    {post.description && (
+                      <div className="md:col-span-2">
+                        <h4 className="text-[#86948A] text-xs font-semibold uppercase tracking-wide mb-2">Description</h4>
+                        <p className="text-[#DDE4DD] text-base leading-relaxed">{post.description}</p>
+                      </div>
+                    )}
                     {post.users && (
                       <div className="md:col-span-2">
                         <h4 className="text-[#86948A] text-xs font-semibold uppercase tracking-wide mb-2">
