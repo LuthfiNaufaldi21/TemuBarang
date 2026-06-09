@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import heroBg from "../assets/Container.png";
 import Secure from "../assets/secure.svg";
-import PrivChatt from "../assets/privchatt.svg";
+import PrivChatt from "../assets/privChatt.svg";
 import AI from "../assets/aiMatch.svg";
 import Report from "../assets/report.svg";
 import Match from "../assets/match.svg";
