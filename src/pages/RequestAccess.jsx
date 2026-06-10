@@ -43,17 +43,17 @@ function RequestAccess() {
   }
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center bg-linear-to-t from-[#0A100D]/98 to-[#164A41] overflow-hidden px-4 py-12">
+    <div className="relative min-h-[100dvh] flex items-start sm:items-center justify-center bg-linear-to-t from-[#0A100D]/98 to-[#164A41] overflow-x-hidden overflow-y-auto px-4 pt-8 pb-[calc(2rem+env(safe-area-inset-bottom))] sm:py-12">
       <div className="absolute top-[-10%] left-[-10%] w-125 h-125 bg-teal-900/40 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-10%] w-125 h-125 bg-emerald-950/60 rounded-full blur-3xl pointer-events-none" />
 
-      <div className="relative z-10 w-full max-w-140 flex flex-col items-center gap-10">
+      <div className="relative z-10 w-full max-w-140 flex flex-col items-center gap-7 sm:gap-10">
         <div className="text-center space-y-2">
           <h1 className="text-white text-[20px] font-bold tracking-wide">Request Access</h1>
           <p className="text-gray-400 text-base font-medium">Create your TemuBarang account</p>
         </div>
 
-        <div className="w-full bg-white/3 backdrop-blur-xl border border-white/10 rounded-4xl p-8 md:p-10 shadow-[0px_8px_32px_0px_rgba(0,0,0,0.40)]">
+        <div className="w-full bg-white/3 backdrop-blur-xl border border-white/10 rounded-3xl sm:rounded-4xl p-6 sm:p-8 md:p-10 shadow-[0px_8px_32px_0px_rgba(0,0,0,0.40)]">
           <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div className="flex flex-col gap-2">

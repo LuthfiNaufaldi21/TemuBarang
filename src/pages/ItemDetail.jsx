@@ -63,7 +63,7 @@ export default function ItemDetail() {
 
   if (loading) {
     return (
-      <div className="flex h-screen bg-[#0E1511] items-center justify-center text-white">
+      <div className="flex h-[100dvh] bg-[#0E1511] items-center justify-center text-white">
         <div className="w-8 h-8 border-2 border-[#9CC88D] border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -71,7 +71,7 @@ export default function ItemDetail() {
 
   if (!post) {
     return (
-      <div className="flex flex-col h-screen bg-[#0E1511] items-center justify-center gap-4 text-white">
+      <div className="flex flex-col h-[100dvh] bg-[#0E1511] items-center justify-center gap-4 text-white">
         <h2 className="text-2xl font-bold text-[#DDE4DD]">Item not found</h2>
         <button onClick={() => navigate(-1)} className="px-6 py-2 bg-[#164A41] rounded-lg">Go Back</button>
       </div>
@@ -85,11 +85,11 @@ export default function ItemDetail() {
       : { text: "FOUND", style: "bg-[#11996C]/50 border-[#11996C]" };
 
   return (
-    <div className="flex h-screen bg-[#0E1511] text-white overflow-hidden selection:bg-[#164A41] selection:text-white">
+    <div className="flex h-[100dvh] min-h-0 bg-[#0E1511] text-white overflow-hidden selection:bg-[#164A41] selection:text-white">
       <Sidebar activePage="" />
-      <div className="flex-1 flex flex-col h-screen overflow-hidden">
+      <div className="flex-1 min-w-0 min-h-0 flex flex-col h-full overflow-hidden">
         <TopBar />
-        <main className="flex-1 overflow-y-auto p-6 md:p-8 pb-32 flex flex-col items-center">
+        <main className="flex-1 min-h-0 overflow-y-auto px-4 pt-4 pb-[calc(9rem+env(safe-area-inset-bottom))] md:p-8 flex flex-col items-center">
           <div className="w-full max-w-250 flex flex-col gap-6">
             <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-[#86948A] text-sm font-medium hover:text-[#DDE4DD] transition-colors w-fit">
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -105,14 +105,14 @@ export default function ItemDetail() {
                   onError={(e) => { e.target.src = "https://placehold.co/500x500/1A211D/4D774E?text=No+Image"; }} />
               </div>
 
-              <div className="w-full lg:w-[55%] bg-[#161D19] border border-[#3C4A42] rounded-xl p-6 lg:p-8 flex flex-col relative overflow-hidden">
+              <div className="w-full lg:w-[55%] bg-[#161D19] border border-[#3C4A42] rounded-xl p-5 md:p-6 lg:p-8 flex flex-col relative overflow-hidden">
                 <div className="absolute inset-0 bg-[#164A41]/40 shadow-lg pointer-events-none" />
                 <div className="relative z-10 flex flex-col flex-1">
                   <span className={`inline-block text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide backdrop-blur-sm mb-3 border ${badge.style}`}>
                     {badge.text}
                   </span>
 
-                  <h2 className="text-[#DDE4DD] text-3xl font-bold leading-tight mb-3">{post.caption || "Untitled Item"}</h2>
+                  <h2 className="text-[#DDE4DD] text-2xl md:text-3xl font-bold leading-tight mb-3">{post.caption || "Untitled Item"}</h2>
 
                   <hr className="border-[#3C4A42] my-4" />
 

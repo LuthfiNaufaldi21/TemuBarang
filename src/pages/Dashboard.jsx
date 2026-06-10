@@ -62,20 +62,20 @@ function Dashboard({ hasNotification = false }) {
   };
 
   return (
-    <div className="flex h-screen bg-[#0E1511] text-white overflow-hidden selection:bg-[#164A41] selection:text-white">
+    <div className="flex h-[100dvh] min-h-0 bg-[#0E1511] text-white overflow-hidden">
       <Sidebar activePage="dashboard" />
 
-      <div className="flex-1 flex flex-col h-screen overflow-hidden">
+      <div className="flex-1 min-w-0 min-h-0 flex flex-col h-full overflow-hidden">
         <TopBar hasNotification={hasNotification} />
 
-        <main className="flex-1 overflow-y-auto p-4 md:p-8 pb-28 md:pb-8">
-          <div className="bg-[#164A41]/40 border border-[#4D774E]/20 rounded-3xl p-8 md:p-10 relative overflow-hidden backdrop-blur-sm">
+        <main className="flex-1 min-h-0 overflow-y-auto p-4 md:p-8 pb-[calc(7rem+env(safe-area-inset-bottom))] md:pb-8">
+          <div className="bg-[#164A41]/40 border border-[#4D774E]/20 rounded-3xl p-5 md:p-10 relative overflow-hidden backdrop-blur-sm">
             <div className="absolute -top-32 -right-20 w-64 h-64 bg-[#164A41] rounded-full blur-2xl opacity-60"></div>
             <div className="relative z-10">
-              <h2 className="text-[#E2E3DD] text-3xl font-bold mb-2">
+              <h2 className="text-[#E2E3DD] text-2xl md:text-3xl font-bold mb-2">
                 Welcome, {displayName}!
               </h2>
-              <p className="text-[#C2C9BD] text-lg font-normal">
+              <p className="text-[#C2C9BD] text-base md:text-lg font-normal">
                 Here is an overview of campus property reports.
               </p>
             </div>

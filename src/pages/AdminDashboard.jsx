@@ -53,11 +53,11 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="flex h-screen bg-[#0E1511] text-white overflow-hidden selection:bg-[#164A41] selection:text-white">
+    <div className="flex h-[100dvh] min-h-0 bg-[#0E1511] text-white overflow-hidden">
       <Sidebar activePage="admin" />
-      <div className="flex-1 flex flex-col h-screen overflow-hidden">
+      <div className="flex-1 min-w-0 min-h-0 flex flex-col h-full overflow-hidden">
         <TopBar />
-        <main className="flex-1 overflow-y-auto p-6 md:p-8">
+        <main className="flex-1 min-h-0 overflow-y-auto px-4 pt-4 pb-[calc(7rem+env(safe-area-inset-bottom))] md:p-8">
           <div className="max-w-7xl mx-auto flex flex-col gap-6">
             <section className="bg-[#164A41]/40 border border-[#4D774E]/20 rounded-3xl p-8 relative overflow-hidden">
               <div className="absolute -top-24 -right-20 w-64 h-64 bg-[#164A41] rounded-full blur-2xl opacity-60" />

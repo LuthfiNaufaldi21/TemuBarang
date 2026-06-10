@@ -63,11 +63,11 @@ export default function Messages() {
   });
 
   return (
-    <div className="flex h-screen bg-[#0E1511] text-white overflow-hidden">
+    <div className="flex h-[100dvh] min-h-0 bg-[#0E1511] text-white overflow-hidden">
       <Sidebar activePage="messages" />
-      <div className="flex-1 flex flex-col h-screen overflow-hidden">
+      <div className="flex-1 min-w-0 min-h-0 flex flex-col h-full overflow-hidden">
         <TopBar />
-        <main className="flex-1 overflow-y-auto p-6 md:p-10 flex flex-col items-center">
+        <main className="flex-1 min-h-0 overflow-y-auto px-4 pt-4 pb-[calc(8rem+env(safe-area-inset-bottom))] md:p-10 flex flex-col items-center">
           <div className="w-full max-w-225 flex flex-col gap-6">
             <h2 className="text-[#E4E4E7] text-3xl font-bold leading-10">
               Messages

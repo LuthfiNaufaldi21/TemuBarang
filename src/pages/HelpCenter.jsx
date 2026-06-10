@@ -49,15 +49,15 @@ const FAQ_ITEMS = [
 
 export default function HelpCenter() {
   return (
-    <div className="flex h-screen bg-[#0E1511] text-white overflow-hidden selection:bg-[#164A41] selection:text-white">
+    <div className="flex h-[100dvh] min-h-0 bg-[#0E1511] text-white overflow-hidden selection:bg-[#164A41] selection:text-white">
       <Sidebar activePage="help" />
 
-      <div className="flex-1 flex flex-col h-screen overflow-hidden">
+      <div className="flex-1 min-w-0 min-h-0 flex flex-col h-full overflow-hidden">
         <TopBar />
 
-        <main className="flex-1 overflow-y-auto p-6 md:p-8">
+        <main className="flex-1 min-h-0 overflow-y-auto px-4 pt-4 pb-[calc(9rem+env(safe-area-inset-bottom))] md:p-8">
           <div className="max-w-6xl mx-auto flex flex-col gap-6">
-            <section className="bg-[#164A41]/40 border border-[#4D774E]/20 rounded-3xl p-8 relative overflow-hidden">
+            <section className="bg-[#164A41]/40 border border-[#4D774E]/20 rounded-3xl p-5 md:p-8 relative overflow-hidden">
               <div className="absolute -top-24 -right-20 w-64 h-64 bg-[#164A41] rounded-full blur-2xl opacity-60" />
 
               <div className="relative z-10">
@@ -80,7 +80,7 @@ export default function HelpCenter() {
               {GUIDE_CARDS.map((item) => (
                 <article
                   key={item.title}
-                  className="bg-[#1A211D] border border-[#3C4A42]/50 rounded-2xl p-6"
+                  className="bg-[#0E1511] border border-[#3C4A42]/60 rounded-xl p-5"
                 >
                   <div className="w-12 h-12 rounded-xl bg-[#164A41] border border-[#3C4A42] flex items-center justify-center mb-4">
                     <svg
