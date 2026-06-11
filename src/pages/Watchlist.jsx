@@ -66,15 +66,15 @@ export default function Watchlist() {
   const activeCount = watchlist.filter((item) => item.is_active).length;
 
   return (
-    <div className="flex h-screen bg-[#0E1511] text-white overflow-hidden selection:bg-[#164A41] selection:text-white">
+    <div className="flex h-[100dvh] min-h-0 bg-[#0E1511] text-white overflow-hidden selection:bg-[#164A41] selection:text-white">
       <Sidebar activePage="watchlist" />
-      <div className="flex-1 flex flex-col h-screen overflow-hidden">
+      <div className="flex-1 min-w-0 min-h-0 flex flex-col h-full overflow-hidden">
         <TopBar />
-        <main className="flex-1 overflow-y-auto p-6 md:p-8">
+        <main className="flex-1 min-h-0 overflow-y-auto px-4 pt-4 pb-[calc(6.5rem+env(safe-area-inset-bottom))] md:p-8 md:pb-8">
           <div className="max-w-6xl mx-auto flex flex-col gap-6">
 
             {/* Header */}
-            <section className="bg-[#164A41]/40 border border-[#4D774E]/20 rounded-3xl p-8 relative overflow-hidden">
+            <section className="bg-[#164A41]/40 border border-[#4D774E]/20 rounded-3xl p-5 md:p-8 relative overflow-hidden">
               <div className="absolute -top-24 -right-20 w-64 h-64 bg-[#164A41] rounded-full blur-2xl opacity-60" />
               <div className="relative z-10">
                 <p className="text-[#9CC88D] text-sm font-bold uppercase tracking-[0.2em] mb-3">Smart Monitoring</p>
@@ -103,7 +103,7 @@ export default function Watchlist() {
             <section className="grid grid-cols-1 lg:grid-cols-[400px_1fr] gap-6">
 
               {/* Form */}
-              <form onSubmit={handleSubmit} className="bg-[#1A211D] border border-[#3C4A42]/50 rounded-2xl p-6 h-fit">
+              <form onSubmit={handleSubmit} className="bg-[#1A211D] border border-[#3C4A42]/50 rounded-2xl p-5 md:p-6 h-fit">
                 <h2 className="text-[#DDE4DD] text-xl font-bold mb-1">Add Watchlist</h2>
                 <p className="text-[#86948A] text-sm mb-6">Isi detail barang yang kamu cari.</p>
                 <div className="flex flex-col gap-5">
@@ -172,7 +172,7 @@ export default function Watchlist() {
               </form>
 
               {/* Saved Watchlists */}
-              <div className="bg-[#1A211D] border border-[#3C4A42]/50 rounded-2xl p-6">
+              <div className="bg-[#1A211D] border border-[#3C4A42]/50 rounded-2xl p-5 md:p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-6">
                   <div>
                     <h2 className="text-[#DDE4DD] text-xl font-bold">Saved Watchlists</h2>
@@ -185,7 +185,7 @@ export default function Watchlist() {
                     <div className="w-8 h-8 border-2 border-[#9CC88D] border-t-transparent rounded-full animate-spin" />
                   </div>
                 ) : watchlist.length === 0 ? (
-                  <div className="border border-dashed border-[#3C4A42] rounded-2xl p-10 text-center">
+                  <div className="border border-dashed border-[#3C4A42] rounded-2xl p-6 md:p-10 text-center">
                     <div className="w-12 h-12 rounded-full bg-[#164A41]/30 border border-[#3C4A42] flex items-center justify-center mx-auto mb-4">
                       <svg className="w-6 h-6 text-[#9CC88D]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -241,7 +241,7 @@ export default function Watchlist() {
                           </div>
 
                           <button type="button" onClick={() => handleDelete(item.watchlist_id)}
-                            className="px-4 py-2 rounded-lg bg-red-500/10 border border-red-500/30 text-red-300 text-sm font-semibold hover:bg-red-500/20 transition-colors shrink-0">
+                            className="w-full md:w-auto px-4 py-2 rounded-lg bg-red-500/10 border border-red-500/30 text-red-300 text-sm font-semibold hover:bg-red-500/20 transition-colors shrink-0">
                             Delete
                           </button>
                         </div>

@@ -90,13 +90,13 @@ function ReportItem() {
   };
 
   return (
-    <div className="flex h-screen bg-[#0E1511] text-white overflow-hidden selection:bg-[#164A41] selection:text-white">
+    <div className="flex h-[100dvh] min-h-0 bg-[#0E1511] text-white overflow-hidden selection:bg-[#164A41] selection:text-white">
       <Sidebar activePage="report-item" />
 
-      <div className="flex-1 flex flex-col h-screen overflow-hidden">
+      <div className="flex-1 min-w-0 min-h-0 flex flex-col h-full overflow-hidden">
         <TopBar />
 
-        <main className="flex-1 overflow-y-auto p-6 md:p-10 flex flex-col items-center">
+        <main className="flex-1 min-h-0 overflow-y-auto px-4 pt-4 pb-[calc(6.5rem+env(safe-area-inset-bottom))] md:p-10 md:pb-10 flex flex-col items-center">
           <div className="w-full max-w-225 flex flex-col gap-6">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-2">
               <div>
@@ -104,9 +104,9 @@ function ReportItem() {
                 <p className="text-[#BBCABF] text-base">Provide details to help us track and return items quickly.</p>
               </div>
 
-              <div className="flex p-1 bg-[#1A211D] rounded-xl border border-[#3C4A42]">
+              <div className="flex w-full md:w-auto p-1 bg-[#1A211D] rounded-xl border border-[#3C4A42]">
                 <button type="button" onClick={() => setReportType("LOST")}
-                  className={`flex items-center gap-2 px-6 py-3 rounded-lg text-sm font-bold transition-all ${
+                  className={`flex-1 md:flex-none flex items-center justify-center gap-2 px-3 sm:px-6 py-3 rounded-lg text-sm font-bold transition-all ${
                     reportType === "LOST" ? "bg-[#EF4444]/20 text-[#EF4444] shadow-sm" : "text-[#86948A] hover:text-[#BBCABF]"
                   }`}>
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -116,7 +116,7 @@ function ReportItem() {
                 </button>
 
                 <button type="button" onClick={() => setReportType("FOUND")}
-                  className={`flex items-center gap-2 px-6 py-3 rounded-lg text-sm font-bold transition-all ${
+                  className={`flex-1 md:flex-none flex items-center justify-center gap-2 px-3 sm:px-6 py-3 rounded-lg text-sm font-bold transition-all ${
                     reportType === "FOUND" ? "bg-[#9CC88D] text-[#13342E] shadow-sm" : "text-[#86948A] hover:text-[#BBCABF]"
                   }`}>
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
@@ -128,7 +128,7 @@ function ReportItem() {
             </div>
 
             <form onSubmit={handleSubmit}
-              className="w-full bg-[#1A211D] border border-[#3C4A42]/30 rounded-3xl p-8 backdrop-blur-md shadow-xl flex flex-col gap-8 relative overflow-hidden">
+              className="w-full bg-[#1A211D] border border-[#3C4A42]/30 rounded-2xl md:rounded-3xl p-5 md:p-8 backdrop-blur-md shadow-xl flex flex-col gap-6 md:gap-8 relative overflow-hidden">
               <div className="absolute -top-32 -right-32 w-64 h-64 bg-[#9CC88D]/5 rounded-full blur-[80px] pointer-events-none"></div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 relative z-10">
@@ -249,12 +249,12 @@ function ReportItem() {
 
               <div className="w-full h-px bg-[#3C4A42]/30 mt-2"></div>
 
-              <div className="flex justify-end items-center gap-4">
-                <Link to="/dashboard" className="px-8 py-3 text-stone-300 font-bold hover:text-white transition-colors">
+              <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:items-center gap-3 sm:gap-4">
+                <Link to="/dashboard" className="w-full sm:w-auto px-8 py-3 text-center text-stone-300 font-bold hover:text-white transition-colors">
                   Cancel
                 </Link>
                 <button type="submit" disabled={isSubmitting}
-                  className="px-8 py-3 bg-[#9CC88D] hover:bg-[#8bb47d] text-[#13342E] font-bold rounded-xl flex items-center gap-2 transition-all hover:shadow-lg hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed">
+                  className="w-full sm:w-auto px-8 py-3 bg-[#9CC88D] hover:bg-[#8bb47d] text-[#13342E] font-bold rounded-xl flex items-center justify-center gap-2 transition-all hover:shadow-lg hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed">
                   {isSubmitting ? "Posting..." : "Post Item"}
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />

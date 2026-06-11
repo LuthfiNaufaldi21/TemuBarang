@@ -99,14 +99,14 @@ function SuccessProcess() {
   const content = getSuccessContent(type);
 
   return (
-    <div className="flex h-screen bg-[#0E1511] text-white overflow-hidden selection:bg-[#164A41] selection:text-white">
+    <div className="flex h-[100dvh] min-h-0 bg-[#0E1511] text-white overflow-hidden selection:bg-[#164A41] selection:text-white">
       <Sidebar activePage="" />
 
-      <div className="flex-1 flex flex-col h-screen overflow-hidden">
+      <div className="flex-1 min-w-0 min-h-0 flex flex-col h-full overflow-hidden">
         <TopBar />
 
-        <main className="flex-1 flex justify-center items-center p-6 bg-[#0E1511] overflow-y-auto">
-          <div className="w-full max-w-194 min-h-125 bg-[#1A211D] border border-[#3C4A42]/40 rounded-2xl shadow-sm flex flex-col justify-center items-center gap-8 px-10 py-16">
+        <main className="flex-1 min-h-0 overflow-y-auto flex justify-center items-start md:items-center bg-[#0E1511] px-4 pt-4 pb-[calc(6.5rem+env(safe-area-inset-bottom))] md:p-6 md:pb-6">
+          <div className="w-full max-w-194 md:min-h-125 bg-[#1A211D] border border-[#3C4A42]/40 rounded-2xl shadow-sm flex flex-col justify-center items-center gap-6 md:gap-8 px-5 py-10 md:px-10 md:py-16">
             <div className="relative flex justify-center items-center">
               <div className="absolute w-20 h-20 bg-[#9CC88D] rounded-full opacity-20 blur-xl" />
 

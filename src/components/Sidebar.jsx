@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { notificationsAPI } from "../services/api";
 
@@ -14,15 +14,19 @@ const NAV_LINKS = [
 ];
 
 const MOBILE_NAV_LINKS = [
-  { to: "/dashboard", key: "dashboard", label: "Home", icon: "M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" },
+  { to: "/dashboard", key: "dashboard", label: "Dashboard", icon: "M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" },
   { to: "/lost-items", key: "lost-items", label: "Lost", icon: "M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" },
   { to: "/report-item", key: "report-item", label: "Report", icon: "M12 4v16m8-8H4" },
   { to: "/found-items", key: "found-items", label: "Found", icon: "M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" },
   { to: "/messages", key: "messages", label: "Chat", icon: "M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" },
 ];
 
-function Sidebar({ activePage = "" }) {
-  const navigate = useNavigate();
+function Sidebar({ activePage = "", hideMobileNav = false }) {
+  const location = useLocation();
+  const isInsideChatRoom =
+    location.pathname.startsWith("/messages/") &&
+    location.pathname !== "/messages";
+  const shouldHideMobileNav = hideMobileNav || isInsideChatRoom;
   const { user, logout } = useAuth();
   const [hasUnreadMessage, setHasUnreadMessage] = useState(false);
 
@@ -30,7 +34,7 @@ function Sidebar({ activePage = "" }) {
     ? user.full_name.split(" ")[0]
     : user?.email?.split("@")[0] || "Student";
   const avatarUrl = user?.avatar_url || null;
-  const role = user?.role || "student";
+  const role = String(user?.role || "student").toLowerCase();
 
   const checkUnreadMessages = useCallback(async () => {
     try {
@@ -50,9 +54,11 @@ function Sidebar({ activePage = "" }) {
   }, [checkUnreadMessages]);
 
   const handleSignOut = () => {
-    logout();
-    navigate("/login");
+  logout();
+    window.location.replace("/login");
   };
+
+  const mobileNavLinks = MOBILE_NAV_LINKS;
 
   return (
     <>
@@ -78,7 +84,6 @@ function Sidebar({ activePage = "" }) {
             </div>
           </Link>
         </div>
-
         <div className="p-4">
           <Link to="/report-item" className="w-full bg-[#9CC88D] hover:bg-[#8bb47d] text-[#13342E] font-bold py-3 rounded-lg flex items-center justify-center gap-2 shadow-md transition-colors">
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -87,7 +92,6 @@ function Sidebar({ activePage = "" }) {
             Report New Item
           </Link>
         </div>
-
         <nav className="flex-1 overflow-y-auto px-2 space-y-1 mt-2">
           {NAV_LINKS.filter((link) => {
             if (link.key === "admin") return role === "admin";
@@ -128,30 +132,56 @@ function Sidebar({ activePage = "" }) {
         </div>
       </aside>
 
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#0E1511]/95 backdrop-blur-xl border-t border-[#3C4A42]/60 px-2 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))]">
-        <div className="grid grid-cols-5 gap-1">
-          {MOBILE_NAV_LINKS.map((link) => {
-            const isActive = link.key === activePage;
-            const showIndicator = link.key === "messages" && hasUnreadMessage;
-            return (
-              <Link key={link.to} to={link.to}
-                className={`relative flex flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2 transition-colors ${
-                  isActive ? "bg-[#164A41] text-[#9CC88D]" : "text-[#86948A] hover:text-[#DDE4DD]"
-                }`}>
-                <div className="relative">
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d={link.icon} />
-                  </svg>
-                  {showIndicator && (
-                    <span className="absolute -top-1 -right-1 w-2 h-2 bg-[#9CC88D] rounded-full shadow-[0_0_8px_rgba(156,200,141,0.7)]" />
-                  )}
-                </div>
-                <span className="text-[11px] font-semibold leading-none">{link.label}</span>
-              </Link>
-            );
-          })}
-        </div>
-      </nav>
+      {!shouldHideMobileNav && (
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#0E1511]/95 backdrop-blur-xl border-t border-[#3C4A42]/60 px-2 pt-2 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
+          <div
+            className="grid gap-1"
+            style={{
+              gridTemplateColumns: `repeat(${mobileNavLinks.length}, minmax(0, 1fr))`,
+            }}
+          >
+            {mobileNavLinks.map((link) => {
+              const isActive = link.key === activePage;
+              const showIndicator =
+                link.key === "messages" && hasUnreadMessage;
+
+              return (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  className={`relative flex flex-col items-center justify-center gap-1 rounded-2xl px-1 py-2 transition-colors ${
+                    isActive
+                      ? "bg-[#164A41] text-[#9CC88D]"
+                      : "text-[#86948A] hover:text-[#DDE4DD]"
+                  }`}
+                >
+                  <div className="relative">
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d={link.icon}
+                      />
+                    </svg>
+                    {showIndicator && (
+                      <span className="absolute -top-1 -right-1 w-2 h-2 bg-[#9CC88D] rounded-full shadow-[0_0_8px_rgba(156,200,141,0.7)]" />
+                    )}
+                  </div>
+                  <span className="text-[9px] sm:text-[10px] font-semibold leading-none">
+                    {link.label}
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
+        </nav>
+      )}
     </>
   );
 }

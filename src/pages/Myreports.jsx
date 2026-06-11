@@ -41,12 +41,12 @@ export default function MyReports() {
   };
 
   return (
-    <div className="flex h-screen bg-[#0E1511] text-white overflow-hidden selection:bg-[#164A41] selection:text-white">
+    <div className="flex h-[100dvh] min-h-0 bg-[#0E1511] text-white overflow-hidden selection:bg-[#164A41] selection:text-white">
       <Sidebar activePage="my-reports" />
-      <div className="flex-1 flex flex-col h-screen overflow-hidden">
+      <div className="flex-1 min-w-0 min-h-0 flex flex-col h-full overflow-hidden">
         <TopBar />
-        <main className="flex-1 overflow-y-scroll p-6 md:p-8 flex flex-col items-center">
-          <div className="w-full max-w-300 mx-auto flex flex-col gap-6 min-h-[calc(100vh-140px)] pb-32 md:pb-40">
+        <main className="flex-1 min-h-0 overflow-y-auto px-4 pt-4 pb-[calc(6.5rem+env(safe-area-inset-bottom))] md:p-8 md:pb-8 flex flex-col items-center">
+          <div className="w-full max-w-300 mx-auto flex flex-col gap-6">
             <div className="flex flex-col gap-1 w-full">
               <h2 className="text-[#DDE4DD] text-3xl font-bold mb-1">
                 {activeTab === "active" ? "My Reports" : "Report History"}
@@ -80,19 +80,19 @@ export default function MyReports() {
               ) : (
                 <div className="flex flex-col gap-4 mt-2">
                   {activePosts.map((post) => (
-                    <div key={post.post_id} className="bg-[#1A211D] border border-[#3C4A42]/30 rounded-xl overflow-hidden flex">
-                      <div className="w-64 shrink-0 relative overflow-hidden">
+                    <div key={post.post_id} className="bg-[#1A211D] border border-[#3C4A42]/30 rounded-xl overflow-hidden flex flex-col md:flex-row">
+                      <div className="w-full h-52 md:w-64 md:h-auto shrink-0 relative overflow-hidden">
                         <img src={post.item_image || "https://placehold.co/256x200/1A211D/4D774E?text=No+Image"}
-                          alt={post.caption} className="w-full h-full object-cover min-h-50"
+                          alt={post.caption} className="w-full h-full object-cover"
                           onError={(e) => { e.target.src = "https://placehold.co/256x200/1A211D/4D774E?text=No+Image"; }} />
                       </div>
-                      <div className="flex-1 p-6 flex flex-col justify-between">
+                      <div className="flex-1 p-4 md:p-6 flex flex-col justify-between">
                         <div className="flex flex-col gap-3">
-                          <div className="flex items-start justify-between">
+                          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                             <h3 className="text-[#DDE4DD] text-xl font-bold">{post.caption || "Untitled"}</h3>
                             {getTypeBadge(post)}
                           </div>
-                          <div className="flex items-center gap-6">
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6">
                             <span className="flex items-center gap-2 text-sm text-[#BBCABF]">
                               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0zM15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -107,15 +107,7 @@ export default function MyReports() {
                             </span>
                           </div>
                         </div>
-                        <div className="flex items-center justify-end pt-4 mt-2">
-                          <Link to={`/item/${post.post_id}`}
-                            className="flex items-center gap-2 px-6 py-2 bg-[#13342E] border border-[#3C4A42]/50 text-[#9CC88D] text-sm font-semibold rounded-lg hover:bg-[#1a443d] transition-colors">
-                            View Details
-                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M12 5l7 7-7 7" />
-                            </svg>
-                          </Link>
-                        </div>
+                        <div className="flex w-full items-center justify-stretch pt-4 mt-2 md:justify-end"> <Link to={`/item/${post.post_id}`} className="inline-flex w-full md:w-auto items-center justify-center gap-2 px-5 py-2.5 bg-[#13342E] border border-[#3C4A42]/50 text-[#9CC88D] text-sm font-semibold rounded-lg hover:bg-[#1a443d] transition-colors" > <span>View Details</span> <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} > <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M12 5l7 7-7 7" /> </svg> </Link> </div>
                       </div>
                     </div>
                   ))}

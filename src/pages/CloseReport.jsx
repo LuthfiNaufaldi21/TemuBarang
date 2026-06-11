@@ -224,7 +224,7 @@ export default function CloseReport() {
 
     if (!report) {
         return (
-            <div className="flex h-screen bg-[#0E1511] items-center justify-center">
+            <div className="flex h-[100dvh] bg-[#0E1511] items-center justify-center">
                 <div className="w-8 h-8 border-2 border-[#9CC88D] border-t-transparent rounded-full animate-spin" />
             </div>
         );
@@ -331,14 +331,14 @@ export default function CloseReport() {
     };
 
     return (
-        <div className="flex h-screen bg-[#0E1511] text-neutral-200 overflow-hidden">
+        <div className="flex h-[100dvh] min-h-0 bg-[#0E1511] text-white overflow-hidden">
             <Sidebar activePage="my-reports" />
 
-            <div className="flex-1 flex flex-col overflow-hidden">
+            <div className="flex-1 min-w-0 min-h-0 flex flex-col h-full overflow-hidden">
                 <TopBar />
 
-                <main className="flex-1 overflow-y-auto bg-[#0E1511]">
-                    <div className="w-full max-w-5xl mx-auto p-8 flex items-center justify-center min-h-[calc(100vh-64px)]">
+                <main className="flex-1 min-h-0 overflow-y-auto bg-[#0E1511] pb-[calc(8rem+env(safe-area-inset-bottom))] md:pb-0">
+                    <div className="w-full max-w-5xl mx-auto p-4 md:p-8 flex items-center justify-center min-h-[calc(100dvh-64px)]">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
                             <div className="relative bg-[#1A211D] rounded-2xl shadow-2xl border border-[#3C4A42]/30 p-8 overflow-hidden backdrop-blur-sm">
                                 <div className="absolute -top-24 -left-24 w-64 h-64 bg-[#9CC88D]/10 rounded-full blur-[60px] pointer-events-none" />
@@ -509,11 +509,11 @@ export default function CloseReport() {
                                     )}
                                 </div>
 
-                                <div className="flex items-center justify-end gap-4 mt-4 pt-6 border-t border-[#3C4A42]/30">
+                                <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-3 sm:gap-4 mt-4 pt-6 border-t border-[#3C4A42]/30">
                                     <button
                                         onClick={() => navigate(-1)}
                                         disabled={isSubmitting}
-                                        className="px-8 py-3 bg-[#C62828] hover:bg-[#B71C1C] text-white font-bold rounded-full transition-all hover:shadow-lg transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                                        className="w-full sm:w-auto px-8 py-3 bg-[#C62828] hover:bg-[#B71C1C] text-white font-bold rounded-full transition-all hover:shadow-lg transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                                     >
                                         Cancel
                                     </button>
@@ -521,7 +521,7 @@ export default function CloseReport() {
                                     <button
                                         onClick={handleConfirm}
                                         disabled={isSubmitting || !selectedMethod || reportIsResolved}
-                                        className="px-8 py-3 bg-[#164A41] hover:bg-[#13342E] text-[#9CC88D] border border-[#9CC88D]/30 font-bold rounded-full flex items-center justify-center gap-2 transition-all hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transform active:scale-95 text-sm"
+                                        className="w-full sm:w-auto px-8 py-3 bg-[#164A41] hover:bg-[#13342E] text-[#9CC88D] border border-[#9CC88D]/30 font-bold rounded-full flex items-center justify-center gap-2 transition-all hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transform active:scale-95 text-sm"
                                     >
                                         {isSubmitting ? (
                                             <div className="w-4 h-4 border-2 border-[#9CC88D] border-t-transparent rounded-full animate-spin" />

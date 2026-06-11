@@ -299,7 +299,7 @@ function RecoveryStatus({ steps, currentIndex }) {
   };
 
   return (
-    <div className="w-full p-6 bg-[#1A211D] border border-[#3C4A42]/30 rounded-2xl shadow-sm">
+    <div className="w-full p-4 md:p-6 bg-[#1A211D] border border-[#3C4A42]/30 rounded-2xl shadow-sm overflow-x-auto">
       <p className="text-[#DDE4DD] text-sm font-semibold mb-6 uppercase tracking-widest">
         Recovery Status
       </p>
@@ -345,7 +345,7 @@ function RecoveryStatus({ steps, currentIndex }) {
               </div>
 
               <span
-                className={`text-xs font-semibold text-center leading-tight mt-1 ${current
+                className={`text-[10px] sm:text-xs font-semibold text-center leading-tight mt-1 text-center leading-tight mt-1 ${current
                   ? "text-[#9CC88D]"
                   : done
                     ? "text-[#6B9A60]"
@@ -721,7 +721,7 @@ function MyReportDetail() {
 
   if (isLoading) {
     return (
-      <div className="flex h-screen bg-[#0E1511] items-center justify-center">
+      <div className="flex h-[100dvh] bg-[#0E1511] items-center justify-center">
         <div className="w-8 h-8 border-2 border-[#9CC88D] border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -729,7 +729,7 @@ function MyReportDetail() {
 
   if (!report) {
     return (
-      <div className="flex flex-col h-screen bg-[#0E1511] items-center justify-center gap-4 text-white">
+      <div className="flex flex-col h-[100dvh] bg-[#0E1511] items-center justify-center gap-4 text-white">
         <h2 className="text-2xl font-bold text-[#DDE4DD]">
           Report not found
         </h2>
@@ -745,13 +745,13 @@ function MyReportDetail() {
   }
 
   return (
-    <div className="flex h-screen bg-[#0E1511] text-white overflow-hidden selection:bg-[#164A41]">
+    <div className="flex h-[100dvh] min-h-0 bg-[#0E1511] text-white overflow-hidden selection:bg-[#164A41]">
       <Sidebar activePage="my-reports" />
 
-      <div className="flex-1 flex flex-col h-screen overflow-hidden">
+      <div className="flex-1 min-w-0 min-h-0 flex flex-col h-full overflow-hidden">
         <TopBar />
 
-        <main className="flex-1 overflow-y-auto p-6 md:p-8">
+        <main className="flex-1 min-h-0 overflow-y-auto px-4 pt-4 pb-[calc(6.5rem+env(safe-area-inset-bottom))] md:p-8 md:pb-8">
           <div className="w-full max-w-275 mx-auto flex flex-col gap-6">
             {/* Breadcrumb + actions */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -776,10 +776,10 @@ function MyReportDetail() {
               </button>
 
               {isOwner && !isResolved && (
-                <div className="flex items-center gap-3 shrink-0">
+                <div className="grid grid-cols-1 sm:flex sm:items-center gap-3 w-full sm:w-auto shrink-0">
                   <button
                     onClick={handleEdit}
-                    className="px-4 py-2 rounded-xl border border-[#3C4A42] text-[#A1A1AA] text-sm font-semibold hover:bg-white/5 transition-colors flex items-center gap-2"
+                    className="w-full sm:w-auto px-4 py-2 rounded-xl border border-[#3C4A42] text-[#A1A1AA] text-sm font-semibold hover:bg-white/5 transition-colors flex items-center justify-center gap-2"
                   >
                     <svg
                       className="w-4 h-4"
@@ -799,7 +799,7 @@ function MyReportDetail() {
 
                   <button
                     onClick={handleResolve}
-                    className="px-4 py-2 rounded-xl bg-[#164A41] border border-[#9CC88D]/30 text-[#9CC88D] text-sm font-bold hover:bg-[#13342E] transition-colors flex items-center gap-2"
+                    className="w-full sm:w-auto px-4 py-2 rounded-xl bg-[#164A41] border border-[#9CC88D]/30 text-[#9CC88D] text-sm font-bold hover:bg-[#13342E] transition-colors flex items-center justify-center gap-2"
                   >
                     <svg
                       className="w-4 h-4"
@@ -1446,7 +1446,7 @@ function MyReportDetail() {
               </div>
             </div>
 
-            <div className="h-8 md:h-12 w-full shrink-0" />
+            <div className="h-2 md:h-8 w-full shrink-0" />
           </div>
         </main>
       </div>

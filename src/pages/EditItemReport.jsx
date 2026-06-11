@@ -143,20 +143,20 @@ export default function EditItemReport() {
 
   if (isLoading) {
     return (
-      <div className="flex h-screen bg-[#0E1511] items-center justify-center">
+      <div className="flex h-[100dvh] bg-[#0E1511] items-center justify-center">
         <div className="w-8 h-8 border-2 border-[#9CC88D] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="flex h-screen bg-[#0E1511] text-white overflow-hidden">
+    <div className="flex h-[100dvh] min-h-0 bg-[#0E1511] text-white overflow-hidden">
       <Sidebar activePage="my-reports" />
 
-      <div className="flex-1 flex flex-col h-screen overflow-hidden">
+      <div className="flex-1 min-w-0 min-h-0 flex flex-col h-full overflow-hidden">
         <TopBar />
 
-        <main className="flex-1 overflow-y-auto p-6 md:p-10 flex flex-col items-center">
+        <main className="flex-1 min-h-0 overflow-y-auto px-4 pt-4 pb-[calc(9rem+env(safe-area-inset-bottom))] md:p-10 flex flex-col items-center">
           <div className="w-full max-w-225 flex flex-col gap-6">
             {/* Header Info */}
             <div className="flex flex-col gap-4">
@@ -196,7 +196,7 @@ export default function EditItemReport() {
             <div className="bg-[#1A211D] border border-[#3C4A42]/30 rounded-3xl shadow-sm overflow-hidden flex flex-col">
               <div className="flex flex-col lg:flex-row">
                 {/* Left: Photo Preview */}
-                <div className="w-full lg:w-80 p-8 border-b lg:border-b-0 lg:border-r border-[#3C4A42]/20 flex flex-col gap-4 relative overflow-hidden">
+                <div className="w-full lg:w-80 p-5 md:p-8 border-b lg:border-b-0 lg:border-r border-[#3C4A42]/20 flex flex-col gap-4 relative overflow-hidden">
                   <div className="absolute -top-24 -left-24 w-48 h-48 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
 
                   <label className="text-[#86948A] text-xs font-bold uppercase tracking-wider relative z-10">
@@ -243,7 +243,7 @@ export default function EditItemReport() {
                 </div>
 
                 {/* Right: Form Inputs */}
-                <div className="flex-1 p-8 flex flex-col gap-6 relative">
+                <div className="flex-1 p-5 md:p-8 flex flex-col gap-6 relative">
                   <div className="absolute -bottom-24 -right-24 w-48 h-48 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
 
                   {/* Item Name */}
@@ -377,11 +377,11 @@ export default function EditItemReport() {
               </div>
 
               {/* Bottom Actions */}
-              <div className="px-8 pb-8 pt-2 flex flex-col sm:flex-row justify-end gap-4 relative z-10">
+              <div className="px-5 md:px-8 pb-6 md:pb-8 pt-2 flex flex-col sm:flex-row justify-end gap-4 relative z-10">
                 <button
                   onClick={() => navigate(`/my-reports/${id}`)}
                   disabled={isSaving}
-                  className="px-8 py-3 bg-[#C62828] hover:bg-[#B71C1C] text-white font-bold rounded-full transition-all hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transform active:scale-95"
+                  className="w-full sm:w-auto px-8 py-3 bg-[#C62828] hover:bg-[#B71C1C] text-white font-bold rounded-full transition-all hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transform active:scale-95"
                 >
                   Cancel
                 </button>
@@ -389,7 +389,7 @@ export default function EditItemReport() {
                 <button
                   onClick={handleSave}
                   disabled={isSaving}
-                  className="px-8 py-3 bg-[#164A41] hover:bg-[#13342E] text-[#9CC88D] border border-[#9CC88D]/30 font-bold rounded-full flex items-center justify-center gap-2 transition-all hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transform active:scale-95"
+                  className="w-full sm:w-auto px-8 py-3 bg-[#164A41] hover:bg-[#13342E] text-[#9CC88D] border border-[#9CC88D]/30 font-bold rounded-full flex items-center justify-center gap-2 transition-all hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transform active:scale-95"
                 >
                   {isSaving ? (
                     <div className="w-4 h-4 border-2 border-[#9CC88D] border-t-transparent rounded-full animate-spin" />

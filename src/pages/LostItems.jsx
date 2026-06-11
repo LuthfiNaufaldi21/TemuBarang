@@ -41,21 +41,31 @@ export default function LostItems() {
   const current = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   return (
-    <div className="flex h-screen bg-[#0E1511] text-white overflow-hidden selection:bg-[#164A41] selection:text-white">
+    <div className="flex h-[100dvh] min-h-0 bg-[#0E1511] text-white overflow-hidden">
       <Sidebar activePage="lost-items" />
-      <div className="flex-1 flex flex-col h-screen overflow-hidden">
+      <div className="flex-1 min-w-0 min-h-0 flex flex-col h-full overflow-hidden">
         <TopBar />
-        <main className="flex-1 overflow-y-scroll p-6 md:p-8 flex flex-col items-center">
-          <div className="w-full max-w-300 mx-auto flex flex-col gap-6 min-h-[calc(100vh-140px)]">
+        <main className="flex-1 min-h-0 overflow-y-auto px-4 pt-4 pb-[calc(6.5rem+env(safe-area-inset-bottom))] md:p-8 md:pb-8 flex flex-col items-center">
+          <div className="w-full max-w-300 mx-auto flex flex-col gap-6">
             <div className="flex flex-col gap-1 w-full">
               <h2 className="text-[#DDE4DD] text-3xl font-bold mb-1">Lost Items Gallery</h2>
               <p className="text-[#A1A1AA] text-base">Help your community reunite with their belongings.</p>
             </div>
 
-            <div className="flex flex-wrap items-center gap-3 w-full mb-4">
+            <div className="flex flex-wrap items-center gap-2 w-full mb-4">
               {categories.map((f) => (
-                <button key={f} onClick={() => { setActiveFilter(f); setCurrentPage(1); }}
-                  className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${activeFilter === f ? "bg-[#164A41] text-[#9CC88D]" : "bg-[#1A211D] text-[#A1A1AA] hover:bg-[#242C27] hover:text-[#DDE4DD]"}`}>
+                <button
+                  key={f}
+                  onClick={() => {
+                    setActiveFilter(f);
+                    setCurrentPage(1);
+                  }}
+                  className={`px-4 md:px-6 py-2 rounded-full text-sm font-medium transition-colors ${
+                    activeFilter === f
+                      ? "bg-[#164A41] text-[#9CC88D]"
+                      : "bg-[#1A211D] text-[#A1A1AA] hover:bg-[#242C27] hover:text-[#DDE4DD]"
+                  }`}
+                >
                   {f}
                 </button>
               ))}
@@ -109,7 +119,7 @@ export default function LostItems() {
             )}
 
             {filtered.length > 0 && (
-              <div className="w-full flex flex-col md:flex-row justify-between items-center gap-6 mt-10 mb-6 pt-8 pb-8 border-t border-[#27272A]">
+              <div className="w-full flex flex-col md:flex-row justify-between items-center gap-5 mt-8 pt-6 pb-2 border-t border-[#27272A]">
                 <div className="text-[#71717A] text-sm">Showing <span className="text-[#DDE4DD] font-semibold">{filtered.length}</span> lost items</div>
                 <div className="flex items-center gap-2">
                   <button onClick={() => currentPage > 1 && setCurrentPage(p => p - 1)} disabled={currentPage <= 1}

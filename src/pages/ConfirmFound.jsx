@@ -481,20 +481,20 @@ function ConfirmFound() {
 
   if (isLoading || !itemDetail) {
     return (
-      <div className="flex h-screen bg-[#0E1511] items-center justify-center text-white">
+      <div className="flex h-[100dvh] bg-[#0E1511] items-center justify-center text-white">
         Loading...
       </div>
     );
   }
 
   return (
-    <div className="flex h-screen bg-[#0E1511] text-white overflow-hidden selection:bg-[#164A41] selection:text-white">
+    <div className="flex h-[100dvh] min-h-0 bg-[#0E1511] text-white overflow-hidden selection:bg-[#164A41] selection:text-white">
       <Sidebar activePage="" />
 
-      <div className="flex-1 flex flex-col h-screen overflow-hidden">
+      <div className="flex-1 min-w-0 min-h-0 flex flex-col h-full overflow-hidden">
         <TopBar />
 
-        <main className="flex-1 overflow-y-auto p-6 md:p-10 flex flex-col items-center">
+        <main className="flex-1 min-h-0 overflow-y-auto px-4 pt-4 pb-[calc(9rem+env(safe-area-inset-bottom))] md:p-10 flex flex-col items-center">
           <div className="w-full max-w-7xl flex flex-col gap-6">
             <button
               onClick={() => navigate(-1)}
@@ -516,7 +516,7 @@ function ConfirmFound() {
               Back
             </button>
 
-            <div className="w-full p-8 flex flex-col gap-6 mt-2">
+            <div className="w-full p-4 md:p-8 flex flex-col gap-6 mt-2">
               <div className="w-full flex justify-between items-center mb-2">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-[#A1A1AA]/20 rounded-xl flex justify-center items-center">

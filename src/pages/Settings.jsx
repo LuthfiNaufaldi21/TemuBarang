@@ -14,7 +14,7 @@ const DEFAULT_SETTINGS = {
 
 function SettingToggle({ title, description, checked, onClick }) {
   return (
-    <div className="flex items-center justify-between gap-4 bg-[#0E1511] border border-[#3C4A42]/60 rounded-xl p-4">
+    <div className="flex items-start justify-between gap-4 bg-[#0E1511] border border-[#3C4A42]/60 rounded-xl p-4 min-w-0">
       <div>
         <h3 className="text-[#DDE4DD] font-semibold">{title}</h3>
         <p className="text-[#86948A] text-sm mt-1">{description}</p>
@@ -41,13 +41,13 @@ export default function Settings() {
   };
 
   return (
-    <div className="flex h-screen bg-[#0E1511] text-white overflow-hidden selection:bg-[#164A41] selection:text-white">
+    <div className="flex h-[100dvh] min-h-0 bg-[#0E1511] text-white overflow-hidden selection:bg-[#164A41] selection:text-white">
       <Sidebar activePage="settings" />
-      <div className="flex-1 flex flex-col h-screen overflow-hidden">
+      <div className="flex-1 min-w-0 min-h-0 flex flex-col h-full overflow-hidden">
         <TopBar />
-        <main className="flex-1 overflow-y-auto p-6 md:p-8">
+        <main className="flex-1 min-h-0 overflow-y-auto px-4 pt-4 pb-[calc(6.5rem+env(safe-area-inset-bottom))] md:p-8 md:pb-8">
           <div className="max-w-5xl mx-auto flex flex-col gap-6">
-            <section className="bg-[#164A41]/40 border border-[#4D774E]/20 rounded-3xl p-8 relative overflow-hidden">
+            <section className="bg-[#164A41]/40 border border-[#4D774E]/20 rounded-3xl p-5 md:p-8 relative overflow-hidden">
               <div className="absolute -top-24 -right-20 w-64 h-64 bg-[#164A41] rounded-full blur-2xl opacity-60" />
               <div className="relative z-10">
                 <p className="text-[#9CC88D] text-sm font-bold uppercase tracking-[0.2em] mb-3">Preferences</p>
@@ -56,7 +56,7 @@ export default function Settings() {
               </div>
             </section>
 
-            <section className="bg-[#1A211D] border border-[#3C4A42]/50 rounded-2xl p-6">
+            <section className="bg-[#1A211D] border border-[#3C4A42]/50 rounded-2xl p-5 md:p-6">
               <h2 className="text-[#DDE4DD] text-xl font-bold mb-1">Account Information</h2>
               <p className="text-[#86948A] text-sm mb-6">Your current account details.</p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -81,12 +81,12 @@ export default function Settings() {
               </div>
             </section>
 
-            <section className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-[#1A211D] border border-[#3C4A42]/50 rounded-2xl p-6">
+            <section className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-[#1A211D] border border-[#3C4A42]/50 rounded-2xl p-5 md:p-6">
               <div>
                 <h2 className="text-[#DDE4DD] text-xl font-bold">Save Changes</h2>
                 {savedMessage && <p className="text-[#9CC88D] text-sm font-semibold mt-2">{savedMessage}</p>}
               </div>
-              <button type="button" onClick={handleSave} className="bg-[#9CC88D] hover:bg-[#8bb47d] text-[#13342E] font-bold px-6 py-3 rounded-xl transition-colors">
+              <button type="button" onClick={handleSave} className="w-full md:w-auto bg-[#9CC88D] hover:bg-[#8bb47d] text-[#13342E] font-bold px-6 py-3 rounded-xl transition-colors">
                 Save Settings
               </button>
             </section>

@@ -35,13 +35,13 @@ export default function EditProfile() {
   };
 
   return (
-    <div className="flex h-screen bg-[#0E1511] text-white overflow-hidden selection:bg-[#164A41] selection:text-white">
+    <div className="flex h-[100dvh] min-h-0 bg-[#0E1511] text-white overflow-hidden selection:bg-[#164A41] selection:text-white">
       <Sidebar activePage="profile" />
-      <div className="flex-1 flex flex-col h-screen overflow-hidden">
+      <div className="flex-1 min-w-0 min-h-0 flex flex-col h-full overflow-hidden">
         <TopBar />
-        <main className="flex-1 overflow-y-auto p-6 md:p-10 flex flex-col items-center">
-          <form onSubmit={handleSubmit} className="w-full max-w-6xl flex flex-col gap-6 pb-10">
-            <div className="w-full bg-[#1A211D] border border-[#3C4A42]/30 rounded-xl p-8 backdrop-blur-md flex flex-col gap-6 shadow-sm">
+        <main className="flex-1 min-h-0 overflow-y-auto px-4 pt-4 pb-[calc(9rem+env(safe-area-inset-bottom))] md:p-10 flex flex-col items-center">
+          <form onSubmit={handleSubmit} className="w-full max-w-6xl flex flex-col gap-6">
+            <div className="w-full bg-[#1A211D] border border-[#3C4A42]/30 rounded-xl p-5 md:p-8 backdrop-blur-md flex flex-col gap-6 shadow-sm">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-lg bg-[#9CC88D]/20 flex items-center justify-center text-[#9CC88D]">
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

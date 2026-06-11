@@ -1056,7 +1056,7 @@ function ReviewMatch() {
 
     if (isLoading) {
         return (
-            <div className="flex h-screen bg-[#0E1511] items-center justify-center">
+            <div className="flex h-[100dvh] bg-[#0E1511] items-center justify-center">
                 <div className="w-8 h-8 border-2 border-[#9CC88D] border-t-transparent rounded-full animate-spin" />
             </div>
         );
@@ -1068,7 +1068,7 @@ function ReviewMatch() {
 
     if (!matchData) {
         return (
-            <div className="flex h-screen bg-[#0E1511] items-center justify-center text-[#86948A]">
+            <div className="flex h-[100dvh] bg-[#0E1511] items-center justify-center px-4 text-center text-[#86948A]">
                 Report data not found.
             </div>
         );
@@ -1105,7 +1105,7 @@ function ReviewMatch() {
                             Back
                         </button>
 
-                        <div className="px-4 py-2 bg-[#1A211D] border border-[#3C4A42]/40 rounded-full flex items-center gap-2 w-fit">
+                        <div className="w-full sm:w-fit px-4 py-2 bg-[#1A211D] border border-[#3C4A42]/40 rounded-2xl sm:rounded-full flex items-start sm:items-center gap-2">
                             <svg
                                 className={`w-4 h-4 ${confidenceColor}`}
                                 fill="none"
@@ -1125,14 +1125,14 @@ function ReviewMatch() {
                                 />
                             </svg>
 
-                            <span className={`text-sm font-bold tracking-wide ${confidenceColor}`}>
+                            <span className={`text-xs sm:text-sm font-bold tracking-wide leading-relaxed ${confidenceColor}`}>
                                 AI Confidence: {matchData.confidence}% ·{" "}
                                 {matchData.confidenceLabel}
                             </span>
                         </div>
                     </div>
 
-                    <div className="flex flex-col lg:flex-row gap-6 items-start pb-10">
+                    <div className="flex flex-col lg:flex-row gap-6 items-start">
                         <div className="flex-1 bg-[#1A211D] border border-[#3C4A42]/30 rounded-2xl shadow-sm overflow-hidden flex flex-col md:flex-row">
                             <div className="flex-1 flex flex-col">
                                 <div className="bg-[#0E1511]/70 p-4 border-b border-[#3C4A42]/30 text-center">
@@ -1145,7 +1145,7 @@ function ReviewMatch() {
                                     </p>
                                 </div>
 
-                                <div className="p-6 flex flex-col gap-6">
+                                <div className="p-4 md:p-6 flex flex-col gap-6">
                                     <div className="w-full h-48 bg-[#0E1511] rounded-xl overflow-hidden border border-[#3C4A42]/40 flex items-center justify-center">
                                         <img
                                             src={matchData.lost.image}
@@ -1309,7 +1309,7 @@ function ReviewMatch() {
                         </div>
 
                         <div className="w-full lg:w-90 flex flex-col gap-6 shrink-0">
-                            <div className="bg-[#1A211D] border border-[#3C4A42]/30 rounded-2xl p-6 shadow-sm">
+                            <div className="bg-[#1A211D] border border-[#3C4A42]/30 rounded-2xl p-5 md:p-6 shadow-sm">
                                 <div className="flex items-center gap-3 mb-6 pb-4 border-b border-[#3C4A42]/30">
                                     <div className="w-12 h-12 bg-[#0E1511] border border-[#3C4A42] rounded-full flex justify-center items-center">
                                         <svg

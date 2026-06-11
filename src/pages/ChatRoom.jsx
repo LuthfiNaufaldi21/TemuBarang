@@ -288,7 +288,7 @@ export default function ChatRoom() {
 
   if (loading) {
     return (
-      <div className="flex h-screen bg-[#0E1511] items-center justify-center text-white">
+      <div className="flex h-[100dvh] bg-[#0E1511] items-center justify-center text-white">
         <div className="w-8 h-8 border-2 border-[#9CC88D] border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -319,9 +319,9 @@ export default function ChatRoom() {
   const showResolveBtn = isPostOwner && !isResolved;
 
   return (
-    <div className="flex h-screen bg-[#0E1511] text-white overflow-hidden">
-      <Sidebar activePage="messages" />
-      <div className="flex-1 flex flex-col h-screen overflow-hidden">
+    <div className="flex h-[100dvh] min-h-0 bg-[#0E1511] text-white overflow-hidden">
+        <Sidebar activePage="messages" hideMobileNav />
+        <div className="flex-1 min-w-0 min-h-0 flex flex-col h-full overflow-hidden">
         {/* Header */}
         <div className="bg-[#1A211D] border-b border-[#27272A] px-4 py-3 flex items-center gap-3 shrink-0">
           <button
@@ -346,7 +346,7 @@ export default function ChatRoom() {
           <button
             type="button"
             onClick={() => navigate(`/item/${room.posts.post_id}`)}
-            className="bg-[#0E1511] border-b border-[#27272A]/50 px-6 py-2.5 flex items-center gap-3 text-left hover:bg-[#101A13] transition-colors"
+            className="bg-[#0E1511] border-b border-[#27272A]/50 px-3 md:px-6 py-2.5 flex items-center gap-3 text-left hover:bg-[#101A13] transition-colors"
           >
             {room.posts.item_image && (
               <img
@@ -399,7 +399,7 @@ export default function ChatRoom() {
 
         {/* Messages */}
         <div
-          className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-1"
+          className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-3 md:px-4 pt-4 pb-28 md:py-4 flex flex-col gap-1"
           style={{
             backgroundImage:
               "radial-gradient(circle at 20% 80%, rgba(22,74,65,0.08) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(156,200,141,0.04) 0%, transparent 50%)",
@@ -519,7 +519,7 @@ export default function ChatRoom() {
         </div>
 
         {/* Input — disabled jika resolved */}
-        <div className="bg-[#1A211D] border-t border-[#27272A] px-4 py-3 shrink-0">
+        <div className="fixed md:static bottom-0 left-0 right-0 z-40 bg-[#1A211D] border-t border-[#27272A] px-3 md:px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] shrink-0">
           {lastError && (
             <div className="mb-2 px-3 py-2 text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg">
               {lastError}
@@ -530,8 +530,8 @@ export default function ChatRoom() {
               <span className="text-[#3C4A42] text-xs">Chat ini sudah ditutup</span>
             </div>
           ) : (
-            <div className="flex items-end gap-2">
-              <div className="flex-1">
+            <div className="flex items-center gap-2">
+              <div className="flex-1 min-w-0">
                 <textarea
                   ref={inputRef}
                   value={inputText}
@@ -539,22 +539,27 @@ export default function ChatRoom() {
                   onKeyDown={handleKeyDown}
                   placeholder={`Message ${otherName}...`}
                   rows={1}
-                  className="w-full bg-[#0E1511] border border-[#3C4A42] focus:border-[#9CC88D]/60 rounded-2xl px-4 py-3 text-[#DDE4DD] text-sm placeholder-[#4D5C50] focus:outline-none transition-colors resize-none leading-relaxed max-h-32"
-                  style={{ minHeight: "44px" }}
+                  className="block w-full h-11 min-h-11 max-h-32 resize-none rounded-2xl border border-[#3C4A42] bg-[#0E1511] px-4 py-2.5 text-sm leading-5 text-[#DDE4DD] placeholder-[#4D5C50] outline-none transition-colors focus:border-[#9CC88D]/60"
                   onInput={(e) => {
-                    e.target.style.height = "auto";
-                    e.target.style.height = `${Math.min(e.target.scrollHeight, 128)}px`;
+                    e.target.style.height = "44px";
+                    e.target.style.height = `${Math.min(
+                      Math.max(e.target.scrollHeight, 44),
+                      128
+                    )}px`;
                   }}
                 />
               </div>
+
               <button
+                type="button"
                 onClick={handleSend}
                 disabled={!inputText.trim() || sending}
-                className={`w-11 h-11 rounded-full flex items-center justify-center shrink-0 transition-all ${
+                className={`flex h-11 w-11 shrink-0 self-center items-center justify-center rounded-full transition-all ${
                   inputText.trim() && !sending
-                    ? "bg-[#9CC88D] hover:bg-[#8bb47d] text-[#13342E] hover:scale-105"
-                    : "bg-[#27272A] text-[#3C4A42] cursor-not-allowed"
+                    ? "bg-[#9CC88D] text-[#13342E] hover:scale-105 hover:bg-[#8bb47d]"
+                    : "cursor-not-allowed bg-[#27272A] text-[#3C4A42]"
                 }`}
+                aria-label="Send message"
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />

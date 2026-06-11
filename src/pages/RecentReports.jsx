@@ -45,10 +45,10 @@ export default function RecentReports() {
   const current = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   return (
-    <div className="flex h-screen bg-[#0E1511] text-white overflow-hidden selection:bg-[#164A41] selection:text-white">
+    <div className="flex h-[100dvh] min-h-0 bg-[#0E1511] text-white overflow-hidden selection:bg-[#164A41] selection:text-white">
       {isFilterOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="bg-[#1A211D] border border-[#3C4A42]/30 w-full max-w-md rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+        <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center overflow-y-auto p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-[#1A211D] border border-[#3C4A42]/30 w-full max-w-md max-h-[calc(100dvh-2rem)] rounded-2xl shadow-2xl flex flex-col overflow-y-auto">
             <div className="flex justify-between items-center p-6 border-b border-[#3C4A42]/30">
               <h3 className="text-[#DDE4DD] text-xl font-bold">Advanced Filters</h3>
               <button onClick={() => setIsFilterOpen(false)} className="text-[#A1A1AA] hover:text-white transition-colors">
@@ -79,10 +79,10 @@ export default function RecentReports() {
       )}
 
       <Sidebar activePage="recent-reports" />
-      <div className="flex-1 flex flex-col h-screen overflow-hidden">
+      <div className="flex-1 min-w-0 min-h-0 flex flex-col h-full overflow-hidden">
         <TopBar />
-        <main className="flex-1 overflow-y-scroll p-6 md:p-8 pb-32 flex flex-col items-center">
-          <div className="w-full max-w-300 mx-auto flex flex-col gap-6 min-h-[calc(100vh-140px)]">
+        <main className="flex-1 min-h-0 overflow-y-auto px-4 pt-4 pb-[calc(6.5rem+env(safe-area-inset-bottom))] md:p-8 md:pb-8 flex flex-col items-center">
+          <div className="w-full max-w-300 mx-auto flex flex-col gap-6">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 w-full">
               <div className="flex flex-col gap-1">
                 <Link to="/dashboard" className="inline-flex items-center gap-2 text-[#A1A1AA] hover:text-[#DDE4DD] transition-colors text-sm font-medium mb-2 w-fit">
@@ -159,24 +159,20 @@ export default function RecentReports() {
             )}
 
             {filtered.length > 0 && (
-              <div className="w-full flex flex-col md:flex-row justify-between items-center gap-6 mt-10 mb-6 pt-8 pb-8 border-t border-[#27272A]">
-                <div className="text-[#71717A] text-sm">Showing <span className="text-[#DDE4DD] font-semibold">{filtered.length}</span> reports</div>
-                <div className="flex items-center gap-2">
-                  <button onClick={() => currentPage > 1 && setCurrentPage(p => p - 1)} disabled={currentPage <= 1}
-                    className={`w-10 h-10 flex items-center justify-center rounded-xl border transition-colors ${currentPage <= 1 ? "border-[#27272A] text-[#27272A] opacity-50 cursor-not-allowed" : "border-[#3C4A42] text-[#A1A1AA] hover:bg-white/5"}`}>
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
-                  </button>
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                    <button key={page} onClick={() => setCurrentPage(page)}
-                      className={`w-10 h-10 flex items-center justify-center rounded-xl transition-colors ${currentPage === page ? "bg-[#9CC88D] text-[#174A41] font-bold" : "border border-[#27272A] text-[#A1A1AA] hover:bg-white/5"}`}>
-                      {page}
-                    </button>
-                  ))}
-                  <button onClick={() => currentPage < totalPages && setCurrentPage(p => p + 1)} disabled={currentPage >= totalPages}
-                    className={`w-10 h-10 flex items-center justify-center rounded-xl border transition-colors ${currentPage >= totalPages ? "border-[#27272A] text-[#27272A] opacity-50 cursor-not-allowed" : "border-[#3C4A42] text-[#A1A1AA] hover:bg-white/5"}`}>
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
-                  </button>
+              <div className="w-full flex flex-col md:flex-row justify-between items-center gap-4 mt-6 pt-5 pb-2 border-t border-[#27272A]">
+                <div className="text-[#71717A] text-sm">
+                  Showing{" "}
+                  <span className="text-[#DDE4DD] font-semibold">
+                    {filtered.length}
+                  </span>{" "}
+                  reports
                 </div>
+
+                {totalPages > 1 && (
+                  <div className="flex items-center gap-2">
+                    {/* tombol previous, angka halaman, dan next */}
+                  </div>
+                )}
               </div>
             )}
           </div>

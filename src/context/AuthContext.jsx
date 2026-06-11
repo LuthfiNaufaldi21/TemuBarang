@@ -53,6 +53,11 @@ export function AuthProvider({ children }) {
 
   const logout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("currentUserEmail");
+    localStorage.removeItem("currentUserRole");
+    localStorage.removeItem("currentUserIdentity");
+    localStorage.removeItem("temuCurrentUser");
+    localStorage.removeItem("temuUser");
     setUser(null);
   };
 
