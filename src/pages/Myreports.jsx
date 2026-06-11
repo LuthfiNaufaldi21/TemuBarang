@@ -107,15 +107,7 @@ export default function MyReports() {
                             </span>
                           </div>
                         </div>
-                        <div className="flex items-center justify-stretch sm:justify-end pt-4 mt-2">
-                          <Link to={`/item/${post.post_id}`}
-                            className="flex items-center gap-2 px-6 py-2 bg-[#13342E] border border-[#3C4A42]/50 text-[#9CC88D] text-sm font-semibold rounded-lg hover:bg-[#1a443d] transition-colors">
-                            View Details
-                            <svg className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-2 bg-[#13342E] border border-[#3C4A42]/50 text-[#9CC88D] text-sm font-semibold rounded-lg hover:bg-[#1a443d] transition-colors" >
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M12 5l7 7-7 7" />
-                            </svg>
-                          </Link>
-                        </div>
+                        <div className="flex w-full items-center justify-stretch pt-4 mt-2 md:justify-end"> <Link to={`/item/${post.post_id}`} className="inline-flex w-full md:w-auto items-center justify-center gap-2 px-5 py-2.5 bg-[#13342E] border border-[#3C4A42]/50 text-[#9CC88D] text-sm font-semibold rounded-lg hover:bg-[#1a443d] transition-colors" > <span>View Details</span> <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} > <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M12 5l7 7-7 7" /> </svg> </Link> </div>
                       </div>
                     </div>
                   ))}

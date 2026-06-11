@@ -530,8 +530,8 @@ export default function ChatRoom() {
               <span className="text-[#3C4A42] text-xs">Chat ini sudah ditutup</span>
             </div>
           ) : (
-            <div className="flex items-end gap-2">
-              <div className="flex-1">
+            <div className="flex items-center gap-2">
+              <div className="flex-1 min-w-0">
                 <textarea
                   ref={inputRef}
                   value={inputText}
@@ -539,22 +539,27 @@ export default function ChatRoom() {
                   onKeyDown={handleKeyDown}
                   placeholder={`Message ${otherName}...`}
                   rows={1}
-                  className="w-full bg-[#0E1511] border border-[#3C4A42] focus:border-[#9CC88D]/60 rounded-2xl px-4 py-3 text-[#DDE4DD] text-sm placeholder-[#4D5C50] focus:outline-none transition-colors resize-none leading-relaxed max-h-32"
-                  style={{ minHeight: "44px" }}
+                  className="block w-full h-11 min-h-11 max-h-32 resize-none rounded-2xl border border-[#3C4A42] bg-[#0E1511] px-4 py-2.5 text-sm leading-5 text-[#DDE4DD] placeholder-[#4D5C50] outline-none transition-colors focus:border-[#9CC88D]/60"
                   onInput={(e) => {
-                    e.target.style.height = "auto";
-                    e.target.style.height = `${Math.min(e.target.scrollHeight, 128)}px`;
+                    e.target.style.height = "44px";
+                    e.target.style.height = `${Math.min(
+                      Math.max(e.target.scrollHeight, 44),
+                      128
+                    )}px`;
                   }}
                 />
               </div>
+
               <button
+                type="button"
                 onClick={handleSend}
                 disabled={!inputText.trim() || sending}
-                className={`w-11 h-11 rounded-full flex items-center justify-center shrink-0 transition-all ${
+                className={`flex h-11 w-11 shrink-0 self-center items-center justify-center rounded-full transition-all ${
                   inputText.trim() && !sending
-                    ? "bg-[#9CC88D] hover:bg-[#8bb47d] text-[#13342E] hover:scale-105"
-                    : "bg-[#27272A] text-[#3C4A42] cursor-not-allowed"
+                    ? "bg-[#9CC88D] text-[#13342E] hover:scale-105 hover:bg-[#8bb47d]"
+                    : "cursor-not-allowed bg-[#27272A] text-[#3C4A42]"
                 }`}
+                aria-label="Send message"
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
