@@ -11,12 +11,14 @@ function TopBar() {
   const { user, logout } = useAuth();
   const role = String(user?.role || "student").toLowerCase();
   const [showMoreMenu, setShowMoreMenu] = useState(false);
+  const [showMobileSearch, setShowMobileSearch] = useState(false);
   const moreMenuRef = useRef(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [hasUnreadNotification, setHasUnreadNotification] = useState(false);
   const dropdownRef = useRef(null);
+  const mobileSearchRef = useRef(null);
   const searchTimeoutRef = useRef(null);
 
   const refreshNotificationState = useCallback(async () => {
@@ -38,12 +40,22 @@ function TopBar() {
 
   useEffect(() => {
     function handleClickOutside(event) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      const outsideDesktopSearch =
+        !dropdownRef.current ||
+        !dropdownRef.current.contains(event.target);
+
+      const outsideMobileSearch =
+        !mobileSearchRef.current ||
+        !mobileSearchRef.current.contains(event.target);
+
+      if (outsideDesktopSearch && outsideMobileSearch) {
         setIsDropdownOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
 
   useEffect(() => {
@@ -83,17 +95,38 @@ function TopBar() {
 
   const handleResultClick = (id) => {
     setIsDropdownOpen(false);
+    setShowMobileSearch(false);
     setSearchQuery("");
     navigate(`/item/${id}`);
   };
 
+    const handleMobileResultClick = (result) => {
+    const resultId = result?.post_id ?? result?.id;
+
+    if (!resultId) {
+      console.error("Search result tidak memiliki ID:", result);
+      return;
+    }
+
+    setIsDropdownOpen(false);
+    setShowMobileSearch(false);
+    setSearchQuery("");
+    setSearchResults([]);
+
+    navigate(`/item/${resultId}`);
+  };
+
   const handleSearchSubmit = (event) => {
     event.preventDefault();
+
     if (!searchQuery.trim()) return;
+
     if (searchResults.length > 0) {
       handleResultClick(searchResults[0].post_id);
       return;
     }
+
+    setShowMobileSearch(false);
     navigate("/recent-reports");
   };
 
@@ -128,27 +161,38 @@ function TopBar() {
               {searchResults.length > 0 ? (
                 <div className="flex flex-col">
                   {searchResults.map((result) => (
-                    <button
+                    <Link
                       key={result.post_id}
-                      onClick={() => handleResultClick(result.post_id)}
-                      className="flex items-start gap-3 p-3 hover:bg-[#1E2820] transition-colors text-left border-b border-[#3C4A42]/30 last:border-0"
+                      to={`/item/${result.post_id}`}
+                      onPointerDown={(event) => event.stopPropagation()}
+                      onClick={() => {
+                        setIsDropdownOpen(false);
+                        setShowMobileSearch(false);
+                        setSearchQuery("");
+                        setSearchResults([]);
+                      }}
+                      className="flex w-full items-start gap-3 border-b border-[#3C4A42]/30 p-3 text-left transition-colors last:border-0 hover:bg-[#1E2820]"
                     >
-                      <div className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center border text-[10px] font-bold ${
-                        result.report_type === "FOUND"
-                          ? "bg-[#11996C]/20 border-[#11996C]/50 text-[#9CC88D]"
-                          : "bg-[#EF4444]/20 border-[#EF4444]/50 text-[#EF4444]"
-                      }`}>
+                      <div
+                        className={`shrink-0 w-9 h-9 rounded-full flex items-center justify-center border text-[10px] font-bold ${
+                          result.report_type === "FOUND"
+                            ? "bg-[#11996C]/20 border-[#11996C]/50 text-[#9CC88D]"
+                            : "bg-[#EF4444]/20 border-[#EF4444]/50 text-[#EF4444]"
+                        }`}
+                      >
                         {result.report_type === "FOUND" ? "F" : "L"}
                       </div>
-                      <div className="flex flex-col overflow-hidden min-w-0">
-                        <span className="text-sm font-semibold text-[#DDE4DD] truncate">
+
+                      <div className="flex min-w-0 flex-1 flex-col">
+                        <span className="truncate text-sm font-semibold text-[#DDE4DD]">
                           {result.caption || "Untitled Item"}
                         </span>
-                        <span className="text-xs text-[#86948A] truncate">
+
+                        <span className="truncate text-xs text-[#86948A]">
                           {result.building_location || "Unknown location"}
                         </span>
                       </div>
-                    </button>
+                    </Link>
                   ))}
                 </div>
               ) : (
@@ -162,6 +206,36 @@ function TopBar() {
       </div>
 
       <div className="flex items-center gap-2 md:gap-4">
+        {/* Search — mobile only */} 
+        <button 
+          type="button" 
+          onClick={() => { 
+            setShowMobileSearch((prev) => !prev); 
+            setShowMoreMenu(false); 
+          }}
+          className={`md:hidden w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${ 
+            showMobileSearch 
+              ? "bg-[#164A41] text-[#9CC88D]" 
+              : "text-[#A1A1AA] hover:text-white hover:bg-white/5"
+          }`}
+          aria-label="Search items"
+          aria-expanded={showMobileSearch}
+        > 
+          <svg 
+            className="w-5 h-5" 
+            fill="none" 
+            viewBox="0 0 24 24" 
+            stroke="currentColor" 
+            strokeWidth={2}
+          > 
+            <path 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" 
+            />
+          </svg>
+        </button>
+
         {/* Notifications */}
         <Link
           to="/notifications"
@@ -395,6 +469,120 @@ function TopBar() {
           )}
         </div>
       </div>
+
+      {showMobileSearch && (
+        <div 
+          ref={mobileSearchRef} 
+          className="md:hidden fixed top-[72px] left-0 right-0 z-[9999] pointer-events-auto bg-[#1A211D] border-b border-[#3C4A42]/50 px-4 py-3 shadow-2xl">
+          <form onSubmit={handleSearchSubmit} className="relative">
+            <svg
+              className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A1A1AA]"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onFocus={() => {
+                if (searchQuery.trim()) {
+                  setIsDropdownOpen(true);
+                }
+              }}
+              placeholder="Search items by name or location..."
+              autoFocus
+              className="w-full bg-[#0E1511] border border-[#3C4A42]/50 rounded-xl py-3 pl-11 pr-10 text-[#DDE4DD] text-sm focus:outline-none focus:border-[#9CC88D] transition-colors placeholder:text-[#86948A]"
+            />
+
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchQuery("");
+                  setSearchResults([]);
+                  setIsDropdownOpen(false);
+                }}
+                className="absolute right-3 top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center rounded-lg text-[#86948A] hover:text-white hover:bg-white/5"
+                aria-label="Clear search"
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            )}
+          </form>
+
+          {isDropdownOpen && searchQuery.trim() && (
+            <div className="mt-2 max-h-72 overflow-y-auto bg-[#0E1511] border border-[#3C4A42]/50 rounded-xl shadow-2xl">
+              {searchResults.length > 0 ? (
+                <div className="flex flex-col">
+                  {searchResults.map((result) => {
+                    const resultId = result?.post_id ?? result?.id;
+                    return (
+                      <button
+                        key={resultId}
+                        type="button"
+                        onPointerDown={(event) => {
+                          event.preventDefault();
+                          event.stopPropagation();
+                          handleMobileResultClick(result);
+                        }}
+                        className="relative z-[10000] flex w-full touch-manipulation items-start gap-3 border-b border-[#3C4A42]/30 p-3 text-left transition-colors last:border-0 active:bg-[#1E2820]"
+                      >
+                        <div
+                          className={`shrink-0 w-9 h-9 rounded-full flex items-center justify-center border text-[10px] font-bold ${
+                            result.report_type === "FOUND"
+                              ? "bg-[#11996C]/20 border-[#11996C]/50 text-[#9CC88D]"
+                              : "bg-[#EF4444]/20 border-[#EF4444]/50 text-[#EF4444]"
+                          }`}
+                        >
+                          {result.report_type === "FOUND" ? "F" : "L"}
+                        </div>
+
+                        <div className="flex min-w-0 flex-1 flex-col">
+                          <span className="truncate text-sm font-semibold text-[#DDE4DD]">
+                            {result.caption || "Untitled Item"}
+                          </span>
+
+                          <span className="truncate text-xs text-[#86948A]">
+                            {result.building_location || "Unknown location"}
+                          </span>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="p-4 text-center text-sm text-[#86948A]">
+                  No results found for{" "}
+                  <span className="font-medium text-[#DDE4DD]">
+                    {searchQuery}
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
     </header>
   );
 }
